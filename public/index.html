@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Current - Your Content. Your Brand. Every Post.</title>
+  <link rel="stylesheet" href="/css/common.css">
+  <style>
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      border-bottom: 1px solid var(--color-gray);
+    }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+    .nav-brand {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--color-primary);
+      text-decoration: none;
+    }
+    .nav-brand span { color: var(--color-accent); }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    .nav-links a {
+      color: var(--color-text-light);
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+    .nav-links a:hover { color: var(--color-accent); }
+    .nav-cta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--color-primary);
+    }
+
+    @media (max-width: 768px) {
+      .hamburger { display: block; }
+      .nav-links, .nav-cta {
+        display: none;
+      }
+      .nav.mobile-open .nav-links,
+      .nav.mobile-open .nav-cta {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 72px; left: 0; right: 0;
+        background: var(--color-white);
+        padding: 24px;
+        border-bottom: 1px solid var(--color-gray);
+        box-shadow: var(--shadow-md);
+      }
+      .nav.mobile-open .nav-cta {
+        top: auto;
+        position: relative;
+        padding: 0;
+        border: none;
+        box-shadow: none;
+      }
+    }
+
+    /* Hero */
+    .hero {
+      padding: 140px 0 100px;
+      background: linear-gradient(135deg, var(--color-primary) 0%, #16213e 100%);
+      color: var(--color-white);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: -50%; right: -20%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(233, 69, 96, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .hero .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    .hero h1 {
+      font-size: 3.25rem;
+      color: var(--color-white);
+      margin-bottom: 20px;
+      line-height: 1.15;
+    }
+    .hero h1 span { color: var(--color-accent); }
+    .hero p {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 36px;
+      line-height: 1.7;
+    }
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .hero-buttons .btn-primary {
+      font-size: 1.1rem;
+      padding: 16px 36px;
+    }
+    .hero-buttons .btn-secondary {
+      color: var(--color-white);
+      border-color: rgba(255, 255, 255, 0.4);
+      font-size: 1.1rem;
+      padding: 16px 36px;
+    }
+    .hero-buttons .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--color-white);
+    }
+    .hero-image {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-lg);
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .hero-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    @media (max-width: 768px) {
+      .hero { padding: 120px 0 60px; }
+      .hero .container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        text-align: center;
+      }
+      .hero h1 { font-size: 2.25rem; }
+      .hero-buttons { justify-content: center; }
+      .hero-image { max-width: 400px; margin: 0 auto; }
+    }
+
+    /* Section */
+    .section {
+      padding: 100px 0;
+    }
+    .section-alt {
+      background: var(--color-light-gray);
+    }
+    .section-header {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 60px;
+    }
+    .section-header h2 {
+      margin-bottom: 16px;
+    }
+    .section-header p {
+      font-size: 1.1rem;
+    }
+
+    /* How It Works */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+    }
+    .step {
+      text-align: center;
+      padding: 40px 30px;
+    }
+    .step-number {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, var(--color-accent), #c0392b);
+      color: var(--color-white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin: 0 auto 24px;
+    }
+    .step h3 { margin-bottom: 12px; }
+    .step p { font-size: 0.95rem; }
+
+    @media (max-width: 768px) {
+      .steps { grid-template-columns: 1fr; gap: 20px; }
+    }
+
+    /* Features */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+    }
+    .feature-card {
+      padding: 36px;
+      border-radius: var(--radius-md);
+      background: var(--color-white);
+      border: 1px solid var(--color-gray);
+      transition: var(--transition);
+    }
+    .feature-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .feature-icon {
+      width: 52px; height: 52px;
+      background: rgba(233, 69, 96, 0.1);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+    .feature-card h3 { margin-bottom: 10px; font-size: 1.25rem; }
+    .feature-card p { font-size: 0.95rem; margin: 0; }
+
+    @media (max-width: 768px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Pricing */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      align-items: start;
+    }
+    .pricing-card {
+      border-radius: var(--radius-lg);
+      background: var(--color-white);
+      border: 2px solid var(--color-gray);
+      padding: 40px 32px;
+      text-align: center;
+      transition: var(--transition);
+      position: relative;
+    }
+    .pricing-card:hover {
+      box-shadow: var(--shadow-lg);
+    }
+    .pricing-card.featured {
+      border-color: var(--color-accent);
+      transform: scale(1.04);
+    }
+    .pricing-card.featured::before {
+      content: 'Most Popular';
+      position: absolute;
+      top: -14px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-accent);
+      color: var(--color-white);
+      padding: 4px 20px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .pricing-card h3 { margin-bottom: 8px; }
+    .pricing-price {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--color-primary);
+      margin: 16px 0;
+    }
+    .pricing-price span {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--color-mid-gray);
+    }
+    .pricing-features {
+      text-align: left;
+      margin: 28px 0;
+    }
+    .pricing-features li {
+      padding: 8px 0;
+      font-size: 0.95rem;
+      color: var(--color-text-light);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .pricing-features li::before {
+      content: '\2713';
+      color: var(--color-success);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+      .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+      .pricing-card.featured { transform: none; }
+    }
+
+    /* Mastermind */
+    .mastermind-banner {
+      background: linear-gradient(135deg, var(--color-primary), #16213e);
+      color: var(--color-white);
+      padding: 60px 0;
+      text-align: center;
+    }
+    .mastermind-banner h2 { color: var(--color-white); margin-bottom: 16px; }
+    .mastermind-banner p { color: rgba(255, 255, 255, 0.85); font-size: 1.15rem; max-width: 600px; margin: 0 auto 8px; }
+    .mastermind-code {
+      display: inline-block;
+      background: rgba(233, 69, 96, 0.2);
+      border: 1px solid rgba(233, 69, 96, 0.4);
+      padding: 8px 24px;
+      border-radius: var(--radius-sm);
+      font-family: monospace;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--color-accent);
+      margin-top: 16px;
+      letter-spacing: 2px;
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--color-primary);
+      color: rgba(255, 255, 255, 0.7);
+      padding: 60px 0 30px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    .footer-brand h3 {
+      color: var(--color-white);
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+    }
+    .footer-brand h3 span { color: var(--color-accent); }
+    .footer-brand p { font-size: 0.9rem; }
+    .footer-links h4 {
+      color: var(--color-white);
+      font-size: 1rem;
+      margin-bottom: 16px;
+    }
+    .footer-links a {
+      display: block;
+      color: rgba(255, 255, 255, 0.6);
+      padding: 4px 0;
+      font-size: 0.9rem;
+    }
+    .footer-links a:hover { color: var(--color-white); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 24px;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 768px) {
+      .footer-grid { grid-template-columns: 1fr; gap: 30px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-brand">Current<span>.</span></a>
+      <div class="nav-links">
+        <a href="#how-it-works">How It Works</a>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <div class="nav-cta">
+        <a href="/login.html" class="btn btn-sm btn-outline">Login</a>
+        <a href="/register.html" class="btn btn-sm btn-primary">Start Free</a>
+      </div>
+      <button class="hamburger" onclick="document.getElementById('nav').classList.toggle('mobile-open')" aria-label="Toggle menu">&#9776;</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1>Your Content. Your Brand. <span>Every Post.</span></h1>
+        <p>Expert real estate content personalized with your photo, logo, and brand colors. Ready to post in seconds.</p>
+        <div class="hero-buttons">
+          <a href="/register.html" class="btn btn-primary">Start Free</a>
+          <a href="#pricing" class="btn btn-secondary">See Pricing</a>
+        </div>
+      </div>
+      <div class="hero-image">
+        <img src="/images/hero.jpg" alt="Current platform preview" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=&quot;padding:40px;text-align:center;color:rgba(255,255,255,0.4)&quot;><div style=&quot;font-size:3rem;margin-bottom:12px&quot;>&#9733;</div><div>Platform Preview</div></div>'">
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="section section-alt" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <h2>How It Works</h2>
+        <p>Three simple steps to professional, branded social media content.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Browse</h3>
+          <p>Expert real estate content published weekly by our team of designers and copywriters.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>Personalize</h3>
+          <p>Your photo, logo, and brand colors are auto-applied to every piece of content you select.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Post</h3>
+          <p>Download your branded content or schedule it directly to your social media accounts.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Everything You Need</h2>
+        <p>Powerful tools to keep your social media consistent, professional, and engaging.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">&#9998;</div>
+          <h3>AI-Powered Caption Rewriting</h3>
+          <p>Transform any caption to match your voice and tone. Our AI rewrites copy that sounds authentically you.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#9881;</div>
+          <h3>Multi-Platform Support</h3>
+          <p>Optimized content for Instagram, Facebook, and LinkedIn. Each post tailored to the platform's best practices.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#128197;</div>
+          <h3>Content Calendar & Scheduling</h3>
+          <p>Plan your content weeks in advance. Schedule posts to go live at the perfect time for maximum engagement.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#127912;</div>
+          <h3>Brand Consistency</h3>
+          <p>Your colors, your logo, your photo on every post. Build a recognizable brand across all platforms.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="section section-alt" id="pricing">
+    <div class="container">
+      <div class="section-header">
+        <h2>Simple, Transparent Pricing</h2>
+        <p>Start free and upgrade as you grow. No hidden fees, cancel anytime.</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <h3>Free</h3>
+          <div class="pricing-price">$0<span>/mo</span></div>
+          <p style="color:var(--color-mid-gray)">Get started at no cost</p>
+          <ul class="pricing-features">
+            <li>5 downloads per month</li>
+            <li>Browse content library</li>
+            <li>Basic personalization</li>
+            <li>Email support</li>
+          </ul>
+          <a href="/register.html" class="btn btn-outline btn-block">Get Started</a>
+        </div>
+        <div class="pricing-card featured">
+          <h3>Pro</h3>
+          <div class="pricing-price">$29<span>/mo</span></div>
+          <p style="color:var(--color-mid-gray)">For active agents</p>
+          <ul class="pricing-features">
+            <li>Unlimited downloads</li>
+            <li>AI caption rewriting</li>
+            <li>Social media scheduling</li>
+            <li>Priority support</li>
+            <li>Advanced analytics</li>
+          </ul>
+          <a href="/register.html" class="btn btn-primary btn-block">Start Free Trial</a>
+        </div>
+        <div class="pricing-card">
+          <h3>Enterprise</h3>
+          <div class="pricing-price">$79<span>/mo</span></div>
+          <p style="color:var(--color-mid-gray)">For teams & brokerages</p>
+          <ul class="pricing-features">
+            <li>Everything in Pro</li>
+            <li>Custom templates</li>
+            <li>Dedicated VA support</li>
+            <li>Team management</li>
+            <li>White-label options</li>
+          </ul>
+          <a href="/register.html" class="btn btn-outline btn-block">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mastermind -->
+  <section class="mastermind-banner">
+    <div class="container">
+      <h2>Mastermind Members</h2>
+      <p>Already a Mastermind member? Use your exclusive code at registration for free access to all Pro features.</p>
+      <div class="mastermind-code">MASTERMIND2026</div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>Current<span>.</span></h3>
+          <p>Professional social media content for real estate agents. Personalized, branded, and ready to post.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Product</h4>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="/pricing.html">Compare Plans</a>
+        </div>
+        <div class="footer-links">
+          <h4>Account</h4>
+          <a href="/login.html">Login</a>
+          <a href="/register.html">Register</a>
+          <a href="/privacy.html">Privacy</a>
+          <a href="/terms.html">Terms</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Current. Edmund Bogen & Eytan Benzeno. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

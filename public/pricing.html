@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing - Current</title>
+  <link rel="stylesheet" href="/css/common.css">
+  <style>
+    .nav {
+      background: var(--color-primary);
+      padding: 0 24px;
+    }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+    .nav-brand {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--color-white);
+      text-decoration: none;
+    }
+    .nav-brand span { color: var(--color-accent); }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .nav-links a {
+      color: rgba(255,255,255,0.8);
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+    .nav-links a:hover { color: var(--color-white); }
+
+    .page-header {
+      background: linear-gradient(135deg, var(--color-primary), #16213e);
+      color: var(--color-white);
+      padding: 120px 0 80px;
+      text-align: center;
+    }
+    .page-header h1 { color: var(--color-white); margin-bottom: 16px; }
+    .page-header p { color: rgba(255,255,255,0.8); font-size: 1.2rem; max-width: 550px; margin: 0 auto; }
+
+    .pricing-section {
+      padding: 80px 0;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .pricing-card {
+      border-radius: var(--radius-lg);
+      background: var(--color-white);
+      border: 2px solid var(--color-gray);
+      padding: 40px 32px;
+      text-align: center;
+      position: relative;
+      transition: var(--transition);
+    }
+    .pricing-card:hover { box-shadow: var(--shadow-lg); }
+    .pricing-card.featured {
+      border-color: var(--color-accent);
+      transform: scale(1.04);
+    }
+    .pricing-card.featured::before {
+      content: 'Most Popular';
+      position: absolute;
+      top: -14px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-accent);
+      color: var(--color-white);
+      padding: 4px 20px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .pricing-card h3 { margin-bottom: 8px; }
+    .pricing-price {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--color-primary);
+      margin: 16px 0;
+    }
+    .pricing-price span { font-size: 1rem; font-weight: 400; color: var(--color-mid-gray); }
+    .pricing-desc {
+      color: var(--color-mid-gray);
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+    .pricing-features {
+      text-align: left;
+      margin: 24px 0;
+    }
+    .pricing-features li {
+      padding: 8px 0;
+      font-size: 0.9rem;
+      color: var(--color-text-light);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .pricing-features li::before {
+      content: '\2713';
+      color: var(--color-success);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+      .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+      .pricing-card.featured { transform: none; }
+    }
+
+    /* Comparison Table */
+    .comparison-section {
+      padding: 80px 0;
+      background: var(--color-light-gray);
+    }
+    .comparison-section h2 {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .comparison-table {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background: var(--color-white);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .comparison-table th,
+    .comparison-table td {
+      padding: 16px 20px;
+      text-align: center;
+      border-bottom: 1px solid var(--color-gray);
+      font-size: 0.9rem;
+    }
+    .comparison-table th {
+      background: var(--color-primary);
+      color: var(--color-white);
+      font-weight: 600;
+    }
+    .comparison-table th:first-child,
+    .comparison-table td:first-child {
+      text-align: left;
+      font-weight: 500;
+    }
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+    .comparison-table tr:hover td {
+      background: var(--color-light-gray);
+    }
+    .check { color: var(--color-success); font-weight: 700; font-size: 1.1rem; }
+    .cross { color: #ccc; font-size: 1.1rem; }
+
+    @media (max-width: 640px) {
+      .comparison-table th, .comparison-table td {
+        padding: 10px 8px;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* FAQ */
+    .faq-section {
+      padding: 80px 0;
+    }
+    .faq-section h2 {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .faq-list {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .faq-item {
+      border-bottom: 1px solid var(--color-gray);
+    }
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 20px 0;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-family);
+    }
+    .faq-question:hover { color: var(--color-accent); }
+    .faq-question .arrow {
+      transition: transform 0.2s;
+      font-size: 0.8rem;
+    }
+    .faq-item.open .faq-question .arrow {
+      transform: rotate(180deg);
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .faq-item.open .faq-answer {
+      max-height: 300px;
+    }
+    .faq-answer p {
+      padding-bottom: 20px;
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    /* CTA */
+    .cta-section {
+      background: linear-gradient(135deg, var(--color-primary), #16213e);
+      padding: 80px 0;
+      text-align: center;
+      color: var(--color-white);
+    }
+    .cta-section h2 { color: var(--color-white); margin-bottom: 16px; }
+    .cta-section p { color: rgba(255,255,255,0.8); font-size: 1.1rem; max-width: 500px; margin: 0 auto 32px; }
+
+    /* Footer */
+    .footer {
+      background: var(--color-primary);
+      color: rgba(255,255,255,0.6);
+      padding: 30px 0;
+      text-align: center;
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-brand">Current<span>.</span></a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/login.html">Login</a>
+        <a href="/register.html" class="btn btn-sm btn-primary">Start Free</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <div class="container">
+      <h1>Choose Your Plan</h1>
+      <p>Start free and scale as your business grows. All plans include a 14-day free trial.</p>
+    </div>
+  </div>
+
+  <section class="pricing-section">
+    <div class="container">
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <h3>Free</h3>
+          <div class="pricing-price">$0<span>/mo</span></div>
+          <p class="pricing-desc">Perfect for getting started</p>
+          <ul class="pricing-features">
+            <li>5 downloads per month</li>
+            <li>Browse full content library</li>
+            <li>Basic personalization (photo + name)</li>
+            <li>Email support</li>
+          </ul>
+          <a href="/register.html" class="btn btn-outline btn-block">Get Started</a>
+        </div>
+        <div class="pricing-card featured">
+          <h3>Pro</h3>
+          <div class="pricing-price">$29<span>/mo</span></div>
+          <p class="pricing-desc">For active agents who post regularly</p>
+          <ul class="pricing-features">
+            <li>Unlimited downloads</li>
+            <li>AI-powered caption rewriting</li>
+            <li>Social media scheduling</li>
+            <li>Full branding (colors, logo, photo)</li>
+            <li>Priority email & chat support</li>
+            <li>Advanced analytics dashboard</li>
+          </ul>
+          <a href="/register.html" class="btn btn-primary btn-block">Start Free Trial</a>
+        </div>
+        <div class="pricing-card">
+          <h3>Enterprise</h3>
+          <div class="pricing-price">$79<span>/mo</span></div>
+          <p class="pricing-desc">For teams and brokerages</p>
+          <ul class="pricing-features">
+            <li>Everything in Pro</li>
+            <li>Custom template creation</li>
+            <li>Dedicated VA support</li>
+            <li>Team management dashboard</li>
+            <li>White-label options</li>
+            <li>API access</li>
+          </ul>
+          <a href="/register.html" class="btn btn-outline btn-block">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="comparison-section">
+    <div class="container">
+      <h2>Feature Comparison</h2>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Free</th>
+            <th>Pro</th>
+            <th>Enterprise</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Content library access</td>
+            <td><span class="check">&#10003;</span></td>
+            <td><span class="check">&#10003;</span></td>
+            <td><span class="check">&#10003;</span></td>
+          </tr>
+          <tr>
+            <td>Downloads per month</td>
+            <td>5</td>
+            <td>Unlimited</td>
+            <td>Unlimited</td>
+          </tr>
+          <tr>
+            <td>Basic personalization</td>
+            <td><span class="check">&#10003;</span></td>
+            <td><span class="check">&#10003;</span></td>
+            <td><span class="check">&#10003;</span></td>
+          </tr>
+          <tr>
+            <td>Full branding (logo, colors)</td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="check">&#10003;</span></td>
+            <td><span class="check">&#10003;</span></td>
+          </tr>
+          <tr>
+            <td>AI caption rewriting</td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="check">&#10003;</span></td>
+            <td><span class="check">&#10003;</span></td>
+          </tr>
+          <tr>
+            <td>Social media scheduling</td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="check">&#10003;</span></td>
+            <td><span class="check">&#10003;</span></td>
+          </tr>
+          <tr>
+            <td>Analytics dashboard</td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="check">&#10003;</span></td>
+            <td><span class="check">&#10003;</span></td>
+          </tr>
+          <tr>
+            <td>Custom templates</td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="check">&#10003;</span></td>
+          </tr>
+          <tr>
+            <td>Dedicated VA support</td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="check">&#10003;</span></td>
+          </tr>
+          <tr>
+            <td>Team management</td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="check">&#10003;</span></td>
+          </tr>
+          <tr>
+            <td>White-label</td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="check">&#10003;</span></td>
+          </tr>
+          <tr>
+            <td>API access</td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="check">&#10003;</span></td>
+          </tr>
+          <tr>
+            <td>Support</td>
+            <td>Email</td>
+            <td>Priority email & chat</td>
+            <td>Dedicated account manager</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="faq-section">
+    <div class="container">
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            Can I switch plans at any time?
+            <span class="arrow">&#9660;</span>
+          </button>
+          <div class="faq-answer">
+            <p>Yes, you can upgrade or downgrade your plan at any time. When upgrading, you'll get immediate access to new features. When downgrading, the change takes effect at the start of your next billing cycle.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            Is there a free trial?
+            <span class="arrow">&#9660;</span>
+          </button>
+          <div class="faq-answer">
+            <p>Yes! All paid plans come with a 14-day free trial. No credit card required to start. You can explore all features before committing.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            What is the Mastermind code?
+            <span class="arrow">&#9660;</span>
+          </button>
+          <div class="faq-answer">
+            <p>If you're a member of our Mastermind group, use the code MASTERMIND2026 during registration to get free access to Pro features. This is our way of rewarding our committed community members.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            Can I cancel anytime?
+            <span class="arrow">&#9660;</span>
+          </button>
+          <div class="faq-answer">
+            <p>Absolutely. There are no long-term contracts. Cancel anytime from your account settings and you won't be charged again. Your access continues until the end of your current billing period.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            Do you offer team discounts?
+            <span class="arrow">&#9660;</span>
+          </button>
+          <div class="faq-answer">
+            <p>Yes! Our Enterprise plan includes team management features. For brokerages with 10+ agents, we offer custom volume pricing. Contact us at sales@current.com for a tailored quote.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+            What social platforms are supported?
+            <span class="arrow">&#9660;</span>
+          </button>
+          <div class="faq-answer">
+            <p>We currently support Instagram, Facebook, and LinkedIn with optimized content for each platform. Twitter/X and TikTok support are coming soon.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="container">
+      <h2>Ready to Elevate Your Brand?</h2>
+      <p>Join thousands of real estate professionals who trust Current for their social media content.</p>
+      <a href="/register.html" class="btn btn-primary btn-lg">Start Free Today</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      &copy; 2026 Current. Edmund Bogen & Eytan Benzeno. All rights reserved.
+    </div>
+  </footer>
+
+</body>
+</html>
