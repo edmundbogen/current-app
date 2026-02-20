@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Current</title>
+  <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="logo">
+        <h1><a href="/" style="color:inherit;text-decoration:none">Current<span>.</span></a></h1>
+      </div>
+      <h2>Welcome Back</h2>
+      <p class="subtitle">Sign in to your account</p>
+
+      <div class="alert alert-error" id="errorAlert"></div>
+      <div class="alert alert-success" id="successAlert"></div>
+
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" class="form-control" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" class="form-control" placeholder="Enter your password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitBtn">Login</button>
+      </form>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="/register.html">Register</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const errorAlert = document.getElementById('errorAlert');
+    const successAlert = document.getElementById('successAlert');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function showError(msg) {
+      errorAlert.textContent = msg;
+      errorAlert.classList.add('show');
+      successAlert.classList.remove('show');
+    }
+
+    function showSuccess(msg) {
+      successAlert.textContent = msg;
+      successAlert.classList.add('show');
+      errorAlert.classList.remove('show');
+    }
+
+    function clearAlerts() {
+      errorAlert.classList.remove('show');
+      successAlert.classList.remove('show');
+    }
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      clearAlerts();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        showError('Please enter both email and password.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Signing in...';
+
+      try {
+        const res = await fetch('/api/auth/subscriber/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || data.message || 'Login failed');
+        }
+
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+
+        showSuccess('Login successful! Redirecting...');
+        setTimeout(function() {
+          window.location.href = '/app';
+        }, 500);
+
+      } catch (err) {
+        showError(err.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Login';
+      }
+    });
+
+    // Redirect if already logged in
+    if (localStorage.getItem('token')) {
+      window.location.href = '/app';
+    }
+  </script>
+</body>
+</html>

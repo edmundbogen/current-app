@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - Content Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-container">
+    <div class="login-logo">
+      <h1>Content Platform</h1>
+      <p>Admin Dashboard</p>
+    </div>
+    <form id="login-form" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" required placeholder="admin@example.com">
+      </div>
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" required placeholder="Password">
+      </div>
+      <div id="login-error" class="error-msg" style="display:none"></div>
+      <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+    </form>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none">
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <h2>Admin</h2>
+      <span id="admin-name"></span>
+    </div>
+    <nav>
+      <a href="#" class="nav-item active" data-tab="dashboard">
+        <span class="nav-icon">&#9632;</span> Dashboard
+      </a>
+      <a href="#" class="nav-item" data-tab="content">
+        <span class="nav-icon">&#9997;</span> Content
+      </a>
+      <a href="#" class="nav-item" data-tab="templates">
+        <span class="nav-icon">&#9881;</span> Templates
+      </a>
+      <a href="#" class="nav-item" data-tab="subscribers">
+        <span class="nav-icon">&#9734;</span> Subscribers
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="#" onclick="handleLogout()" class="nav-item logout">
+        <span class="nav-icon">&#10140;</span> Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+
+    <!-- DASHBOARD TAB -->
+    <section id="tab-dashboard" class="tab-content active">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-subscribers">--</div>
+          <div class="stat-label">Total Subscribers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-pro">--</div>
+          <div class="stat-label">Active Pro</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-content">--</div>
+          <div class="stat-label">Content Published</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-downloads">--</div>
+          <div class="stat-label">Downloads This Month</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTENT TAB -->
+    <section id="tab-content" class="tab-content">
+      <div class="page-header">
+        <h1>Content</h1>
+        <button class="btn btn-primary" onclick="showContentForm()">+ New Content</button>
+      </div>
+
+      <!-- Content Form -->
+      <div id="content-form-panel" class="form-panel" style="display:none">
+        <div class="form-panel-header">
+          <h2 id="content-form-title">New Content</h2>
+          <button class="btn btn-ghost" onclick="hideContentForm()">&times;</button>
+        </div>
+        <form id="content-form" onsubmit="handleContentSubmit(event)">
+          <input type="hidden" id="cf-id">
+          <div class="form-row">
+            <div class="form-group flex-2">
+              <label for="cf-title">Title *</label>
+              <input type="text" id="cf-title" required>
+            </div>
+            <div class="form-group flex-1">
+              <label for="cf-type">Content Type *</label>
+              <select id="cf-type" required onchange="toggleArticleBody()">
+                <option value="graphic">Graphic</option>
+                <option value="article">Article</option>
+                <option value="caption_set">Caption Set</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="cf-category">Category</label>
+              <input type="text" id="cf-category" placeholder="e.g. market_update">
+            </div>
+            <div class="form-group flex-1">
+              <label for="cf-tags">Tags (comma-separated)</label>
+              <input type="text" id="cf-tags" placeholder="real_estate, tips, engagement">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="cf-description">Description</label>
+            <textarea id="cf-description" rows="2" placeholder="Short description for the content item"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="cf-caption-fb">Caption - Facebook</label>
+            <textarea id="cf-caption-fb" rows="3" placeholder="Facebook caption"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="cf-caption-ig">Caption - Instagram</label>
+            <textarea id="cf-caption-ig" rows="3" placeholder="Instagram caption"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="cf-caption-tw">Caption - Twitter</label>
+            <textarea id="cf-caption-tw" rows="2" maxlength="280" placeholder="Twitter caption (280 char max)" oninput="updateTwitterCount()"></textarea>
+            <div class="char-counter"><span id="tw-count">0</span>/280</div>
+          </div>
+          <div class="form-group">
+            <label for="cf-caption-li">Caption - LinkedIn</label>
+            <textarea id="cf-caption-li" rows="3" placeholder="LinkedIn caption"></textarea>
+          </div>
+          <div class="form-group" id="article-body-group" style="display:none">
+            <label for="cf-article-body">Article Body</label>
+            <textarea id="cf-article-body" rows="8" placeholder="Full article text"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="cf-template">Template</label>
+              <select id="cf-template">
+                <option value="">-- None --</option>
+              </select>
+            </div>
+            <div class="form-group flex-1">
+              <label for="cf-image">Featured Image URL</label>
+              <input type="text" id="cf-image" placeholder="https://...">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="cf-status">Status</label>
+              <select id="cf-status">
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+              </select>
+            </div>
+            <div class="form-group flex-1">
+              <label for="cf-vertical">Vertical</label>
+              <select id="cf-vertical">
+                <option value="real_estate">Real Estate</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" onclick="hideContentForm()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="cf-submit-btn">Create Content</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Content Table -->
+      <div class="table-container">
+        <table id="content-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="content-tbody"></tbody>
+        </table>
+        <div id="content-pagination" class="pagination"></div>
+      </div>
+    </section>
+
+    <!-- TEMPLATES TAB -->
+    <section id="tab-templates" class="tab-content">
+      <div class="page-header">
+        <h1>Templates</h1>
+        <button class="btn btn-primary" onclick="showTemplateForm()">+ New Template</button>
+      </div>
+
+      <!-- Template Form -->
+      <div id="template-form-panel" class="form-panel" style="display:none">
+        <div class="form-panel-header">
+          <h2 id="template-form-title">New Template</h2>
+          <button class="btn btn-ghost" onclick="hideTemplateForm()">&times;</button>
+        </div>
+        <form id="template-form" onsubmit="handleTemplateSubmit(event)">
+          <input type="hidden" id="tf-id">
+          <div class="form-row">
+            <div class="form-group flex-2">
+              <label for="tf-name">Name *</label>
+              <input type="text" id="tf-name" required>
+            </div>
+            <div class="form-group flex-1">
+              <label for="tf-platform">Platform *</label>
+              <select id="tf-platform" required onchange="applyPlatformPreset()">
+                <option value="">-- Select --</option>
+                <option value="instagram_square">Instagram Square</option>
+                <option value="facebook_post">Facebook Post</option>
+                <option value="instagram_story">Instagram Story</option>
+                <option value="linkedin_post">LinkedIn Post</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="tf-url">Template Image URL *</label>
+            <input type="text" id="tf-url" required placeholder="https://... (Canva export PNG)">
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="tf-width">Width (px) *</label>
+              <input type="number" id="tf-width" required min="1">
+            </div>
+            <div class="form-group flex-1">
+              <label for="tf-height">Height (px) *</label>
+              <input type="number" id="tf-height" required min="1">
+            </div>
+            <div class="form-group flex-1">
+              <label for="tf-tier">Tier Required</label>
+              <select id="tf-tier">
+                <option value="free">Free</option>
+                <option value="pro">Pro</option>
+                <option value="enterprise">Enterprise</option>
+              </select>
+            </div>
+            <div class="form-group flex-1">
+              <label for="tf-status">Status</label>
+              <select id="tf-status">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="tf-layout">Layout Config (JSON) *</label>
+            <div class="help-text">
+              Define personalization zones. Each zone specifies where subscriber info appears on the template.<br>
+              Format: <code>{ "zones": [{ "type": "photo"|"name"|"logo"|"tagline"|"color", "x": px, "y": px, "width": px, "height": px }] }</code>
+            </div>
+            <textarea id="tf-layout" rows="6" required placeholder='{"zones": [{"type": "photo", "x": 50, "y": 800, "width": 200, "height": 200}, {"type": "name", "x": 270, "y": 850, "width": 400, "height": 40}]}'></textarea>
+          </div>
+
+          <!-- Zone Preview -->
+          <div class="form-group">
+            <label>Zone Preview</label>
+            <button type="button" class="btn btn-small" onclick="renderZonePreview()">Preview Zones</button>
+            <div id="zone-preview" class="zone-preview-container"></div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-ghost" onclick="hideTemplateForm()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="tf-submit-btn">Create Template</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Templates Table -->
+      <div class="table-container">
+        <table id="templates-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Platform</th>
+              <th>Dimensions</th>
+              <th>Tier</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="templates-tbody"></tbody>
+        </table>
+        <div id="templates-pagination" class="pagination"></div>
+      </div>
+    </section>
+
+    <!-- SUBSCRIBERS TAB -->
+    <section id="tab-subscribers" class="tab-content">
+      <div class="page-header">
+        <h1>Subscribers</h1>
+        <div class="filter-bar">
+          <label for="sub-filter-tier">Filter by tier:</label>
+          <select id="sub-filter-tier" onchange="loadSubscribers()">
+            <option value="">All</option>
+            <option value="free">Free</option>
+            <option value="pro">Pro</option>
+            <option value="enterprise">Enterprise</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Subscriber Detail Panel -->
+      <div id="subscriber-detail-panel" class="form-panel" style="display:none">
+        <div class="form-panel-header">
+          <h2>Subscriber Details</h2>
+          <button class="btn btn-ghost" onclick="hideSubscriberDetail()">&times;</button>
+        </div>
+        <div id="subscriber-detail-body"></div>
+      </div>
+
+      <!-- Subscribers Table -->
+      <div class="table-container">
+        <table id="subscribers-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Tier</th>
+              <th>Mastermind</th>
+              <th>Downloads</th>
+              <th>Joined</th>
+            </tr>
+          </thead>
+          <tbody id="subscribers-tbody"></tbody>
+        </table>
+        <div id="subscribers-pagination" class="pagination"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast" style="display:none"></div>
+
+<script src="/admin/js/admin.js"></script>
+</body>
+</html>

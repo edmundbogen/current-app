@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Current</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/app/css/app.css">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <a href="/app" class="topbar-brand">Current<span>.</span></a>
+    <div class="topbar-tabs" id="mobileMenu">
+      <button class="topbar-tab active" data-tab="library">Content Library</button>
+      <button class="topbar-tab" data-tab="assets">My Assets</button>
+      <button class="topbar-tab" data-tab="schedule">Schedule</button>
+      <button class="topbar-tab" data-tab="profile">Profile</button>
+    </div>
+    <div class="topbar-user">
+      <span class="topbar-username" id="userName"></span>
+      <button class="topbar-logout" onclick="window.app.logout()">Logout</button>
+    </div>
+    <button class="mobile-menu-btn" onclick="document.getElementById('mobileMenu').classList.toggle('open')">&#9776;</button>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- Content Library Tab -->
+    <div class="tab-panel active" id="panel-library">
+      <h2 style="margin-bottom:20px;font-size:1.5rem">Content Library</h2>
+      <div class="library-toolbar">
+        <select id="filterCategory">
+          <option value="">All Categories</option>
+          <option value="just_listed">Just Listed</option>
+          <option value="just_sold">Just Sold</option>
+          <option value="open_house">Open House</option>
+          <option value="market_update">Market Update</option>
+          <option value="tips">Tips & Advice</option>
+          <option value="motivation">Motivation</option>
+          <option value="holiday">Holiday</option>
+          <option value="testimonial">Testimonial</option>
+        </select>
+        <select id="filterType">
+          <option value="">All Types</option>
+          <option value="image">Image</option>
+          <option value="carousel">Carousel</option>
+          <option value="video">Video</option>
+          <option value="story">Story</option>
+          <option value="reel">Reel</option>
+        </select>
+        <input type="text" id="filterSearch" placeholder="Search content...">
+      </div>
+      <div id="contentGrid" class="content-grid"></div>
+      <div id="contentPagination" class="pagination"></div>
+    </div>
+
+    <!-- My Assets Tab -->
+    <div class="tab-panel" id="panel-assets">
+      <h2 style="margin-bottom:20px;font-size:1.5rem">My Assets</h2>
+      <div id="assetsGrid" class="assets-grid"></div>
+    </div>
+
+    <!-- Schedule Tab -->
+    <div class="tab-panel" id="panel-schedule">
+      <div class="schedule-header">
+        <h2 style="font-size:1.5rem">Schedule</h2>
+        <div class="schedule-week-nav">
+          <button onclick="window.app.prevWeek()">&larr; Prev</button>
+          <span class="schedule-week-label" id="weekLabel"></span>
+          <button onclick="window.app.nextWeek()">Next &rarr;</button>
+        </div>
+      </div>
+      <div id="scheduleList"></div>
+    </div>
+
+    <!-- Profile Tab -->
+    <div class="tab-panel" id="panel-profile">
+      <h2 style="margin-bottom:20px;font-size:1.5rem">Profile & Branding</h2>
+      <div id="profileContent"></div>
+    </div>
+
+  </main>
+
+  <!-- Personalization Modal -->
+  <div class="modal-backdrop" id="personalizeModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Personalize Content</h3>
+        <button class="modal-close" onclick="window.app.closeModal()">&times;</button>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer" id="personalizeFooter"></div>
+    </div>
+  </div>
+
+  <script src="/app/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - Current</title>
+  <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card" style="max-width:500px">
+      <div class="logo">
+        <h1><a href="/" style="color:inherit;text-decoration:none">Current<span>.</span></a></h1>
+      </div>
+      <h2>Create Your Account</h2>
+      <p class="subtitle">Start creating branded content in minutes</p>
+
+      <div class="alert alert-error" id="errorAlert"></div>
+      <div class="alert alert-success" id="successAlert"></div>
+
+      <form id="registerForm" novalidate>
+        <div class="form-group">
+          <label for="name">Full Name *</label>
+          <input type="text" id="name" class="form-control" placeholder="John Smith" required autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" class="form-control" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="password">Password *</label>
+          <input type="password" id="password" class="form-control" placeholder="At least 8 characters" required autocomplete="new-password">
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password *</label>
+          <input type="password" id="confirmPassword" class="form-control" placeholder="Re-enter your password" required autocomplete="new-password">
+          <div class="form-error hidden" id="passwordError">Passwords do not match</div>
+        </div>
+        <div class="form-group">
+          <label for="company">Company <span style="font-weight:400;color:var(--color-mid-gray)">(optional)</span></label>
+          <input type="text" id="company" class="form-control" placeholder="Your brokerage or company" autocomplete="organization">
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone <span style="font-weight:400;color:var(--color-mid-gray)">(optional)</span></label>
+          <input type="tel" id="phone" class="form-control" placeholder="(555) 123-4567" autocomplete="tel">
+        </div>
+        <div class="form-group">
+          <label for="inviteCode">Invite Code <span style="font-weight:400;color:var(--color-mid-gray)">(optional)</span></label>
+          <input type="text" id="inviteCode" class="form-control" placeholder="e.g. MASTERMIND2026">
+          <div class="form-hint">Mastermind members: enter MASTERMIND2026 for free Pro access</div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitBtn">Create Account</button>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? <a href="/login.html">Login</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('registerForm');
+    const errorAlert = document.getElementById('errorAlert');
+    const successAlert = document.getElementById('successAlert');
+    const submitBtn = document.getElementById('submitBtn');
+    const passwordError = document.getElementById('passwordError');
+    const passwordField = document.getElementById('password');
+    const confirmField = document.getElementById('confirmPassword');
+
+    function showError(msg) {
+      errorAlert.textContent = msg;
+      errorAlert.classList.add('show');
+      successAlert.classList.remove('show');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showSuccess(msg) {
+      successAlert.textContent = msg;
+      successAlert.classList.add('show');
+      errorAlert.classList.remove('show');
+    }
+
+    function clearAlerts() {
+      errorAlert.classList.remove('show');
+      successAlert.classList.remove('show');
+    }
+
+    // Live password match validation
+    confirmField.addEventListener('input', function() {
+      if (this.value && this.value !== passwordField.value) {
+        passwordError.classList.remove('hidden');
+        this.classList.add('error');
+      } else {
+        passwordError.classList.add('hidden');
+        this.classList.remove('error');
+      }
+    });
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      clearAlerts();
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = passwordField.value;
+      const confirmPassword = confirmField.value;
+      const company = document.getElementById('company').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const inviteCode = document.getElementById('inviteCode').value.trim();
+
+      if (!name || !email || !password || !confirmPassword) {
+        showError('Please fill in all required fields.');
+        return;
+      }
+
+      if (password.length < 8) {
+        showError('Password must be at least 8 characters.');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showError('Passwords do not match.');
+        confirmField.classList.add('error');
+        passwordError.classList.remove('hidden');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating account...';
+
+      try {
+        const body = { name, email, password };
+        if (company) body.company = company;
+        if (phone) body.phone = phone;
+        if (inviteCode) body.invite_code = inviteCode;
+
+        const res = await fetch('/api/auth/subscriber/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || data.message || 'Registration failed');
+        }
+
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+
+        showSuccess('Account created! Redirecting...');
+        setTimeout(function() {
+          window.location.href = '/app';
+        }, 500);
+
+      } catch (err) {
+        showError(err.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Account';
+      }
+    });
+
+    if (localStorage.getItem('token')) {
+      window.location.href = '/app';
+    }
+  </script>
+</body>
+</html>
