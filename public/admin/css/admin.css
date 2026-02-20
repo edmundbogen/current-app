@@ -1,15 +1,15 @@
 /* ===== CSS Custom Properties ===== */
 :root {
-  --sidebar-bg: #1a1a2e;
+  --sidebar-bg: #1a3e5c;
   --sidebar-text: #a0a0b8;
   --sidebar-active: #ffffff;
   --sidebar-hover: #16213e;
   --sidebar-width: 240px;
-  --accent: #e94560;
+  --accent: #00a8e1;
   --accent-hover: #d63851;
   --content-bg: #f5f6fa;
   --card-bg: #ffffff;
-  --text-primary: #1a1a2e;
+  --text-primary: #1a3e5c;
   --text-secondary: #6b7280;
   --border: #e5e7eb;
   --success: #10b981;
@@ -28,7 +28,7 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   background: var(--content-bg);
   color: var(--text-primary);
   line-height: 1.5;
@@ -41,7 +41,7 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: linear-gradient(135deg, #1a3e5c 0%, #16213e 50%, #0f3460 100%);
 }
 
 .login-container {

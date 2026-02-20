@@ -16,7 +16,7 @@ const FROM_EMAIL = process.env.SES_FROM_EMAIL;
 async function sendWelcomeEmail(subscriberEmail, subscriberName) {
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <h1 style="color: #1a1a2e; border-bottom: 3px solid #e94560; padding-bottom: 10px;">Welcome to the Platform!</h1>
+      <h1 style="color: #1a3e5c; border-bottom: 3px solid #00a8e1; padding-bottom: 10px;">Welcome to the Platform!</h1>
       <p style="font-size: 16px; color: #333;">Hi ${subscriberName},</p>
       <p style="font-size: 16px; color: #333;">Thanks for signing up! We're excited to help you create personalized, professional social media content for your real estate business.</p>
       <p style="font-size: 16px; color: #333;">Here's what you can do next:</p>
@@ -43,10 +43,10 @@ async function sendPasswordResetEmail(email, resetToken) {
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <h1 style="color: #1a1a2e; border-bottom: 3px solid #e94560; padding-bottom: 10px;">Password Reset</h1>
+      <h1 style="color: #1a3e5c; border-bottom: 3px solid #00a8e1; padding-bottom: 10px;">Password Reset</h1>
       <p style="font-size: 16px; color: #333;">You requested a password reset. Click the link below to set a new password:</p>
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${resetUrl}" style="background: #e94560; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px;">Reset Password</a>
+        <a href="${resetUrl}" style="background: #00a8e1; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 16px;">Reset Password</a>
       </p>
       <p style="font-size: 14px; color: #999;">If you didn't request this, you can safely ignore this email.</p>
     </div>

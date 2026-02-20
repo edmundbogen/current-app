@@ -3,8 +3,8 @@
    ============================================ */
 
 :root {
-  --color-primary: #1a1a2e;
-  --color-accent: #e94560;
+  --color-primary: #1a3e5c;
+  --color-accent: #00a8e1;
   --color-accent-hover: #d63050;
   --color-white: #ffffff;
   --color-light-gray: #f8f9fa;
@@ -21,7 +21,7 @@
   --color-instagram: #e4405f;
   --color-linkedin: #0a66c2;
   --color-twitter: #1da1f2;
-  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
   --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
   --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);

@@ -519,7 +519,7 @@ function renderZonePreview() {
     div.style.top = Math.round(zone.y * scale) + 'px';
     div.style.width = Math.round(zone.width * scale) + 'px';
     div.style.height = Math.round(zone.height * scale) + 'px';
-    const color = ZONE_COLORS[zone.type] || '#e94560';
+    const color = ZONE_COLORS[zone.type] || '#00a8e1';
     div.style.borderColor = color;
     div.style.color = color;
     div.style.background = color + '14';

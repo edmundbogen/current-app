@@ -575,17 +575,17 @@
               '<input type="file" id="logoInput" accept="image/*" style="display:none" onchange="window.app.uploadFile(\'logo\', this)"></div>' +
             '</div>' +
             '<div class="color-picker-row">' +
-              '<div class="color-picker-group"><label>Primary Color</label><input type="color" id="brandColorPrimary" value="' + escapeAttr(branding.color_primary || '#1a1a2e') + '" onchange="window.app.updateBrandPreview()"></div>' +
-              '<div class="color-picker-group"><label>Secondary Color</label><input type="color" id="brandColorSecondary" value="' + escapeAttr(branding.color_secondary || '#e94560') + '" onchange="window.app.updateBrandPreview()"></div>' +
+              '<div class="color-picker-group"><label>Primary Color</label><input type="color" id="brandColorPrimary" value="' + escapeAttr(branding.color_primary || '#1a3e5c') + '" onchange="window.app.updateBrandPreview()"></div>' +
+              '<div class="color-picker-group"><label>Secondary Color</label><input type="color" id="brandColorSecondary" value="' + escapeAttr(branding.color_secondary || '#00a8e1') + '" onchange="window.app.updateBrandPreview()"></div>' +
             '</div>' +
             '<div class="form-group"><label>Tagline</label><input type="text" id="brandTagline" value="' + escapeAttr(branding.tagline || '') + '" placeholder="Your professional tagline" oninput="window.app.updateBrandPreview()"></div>' +
             '<div class="brand-preview" id="brandPreviewArea">' +
               '<div class="brand-preview-card">' +
-                '<div class="brand-preview-header" id="previewHeader" style="background:' + escapeAttr(branding.color_primary || '#1a1a2e') + '">' +
+                '<div class="brand-preview-header" id="previewHeader" style="background:' + escapeAttr(branding.color_primary || '#1a3e5c') + '">' +
                   '<div class="brand-preview-photo" id="previewPhoto">' + (branding.photo_url ? '<img src="' + escapeAttr(branding.photo_url) + '">' : '') + '</div>' +
                   '<div class="brand-preview-name" style="color:#fff">' + escapeHtml(u.name || 'Your Name') + '</div>' +
                 '</div>' +
-                '<div class="brand-preview-image" style="background:' + escapeAttr(branding.color_secondary || '#e94560') + '">' +
+                '<div class="brand-preview-image" style="background:' + escapeAttr(branding.color_secondary || '#00a8e1') + '">' +
                   '<div class="brand-preview-logo" id="previewLogo">' + (branding.logo_url ? '<img src="' + escapeAttr(branding.logo_url) + '">' : '') + '</div>' +
                 '</div>' +
                 '<div class="brand-preview-footer" id="previewTagline">' + escapeHtml(branding.tagline || 'Your tagline here') + '</div>' +
