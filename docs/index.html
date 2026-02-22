@@ -137,20 +137,35 @@
       background: rgba(255, 255, 255, 0.1);
       border-color: var(--color-white);
     }
-    .hero-image {
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: var(--radius-lg);
-      aspect-ratio: 4/3;
+    .hero-founders {
       display: flex;
-      align-items: center;
+      gap: 24px;
+      align-items: flex-end;
       justify-content: center;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    .hero-image img {
+    .founder-card {
+      text-align: center;
+      flex: 1;
+    }
+    .founder-card img {
       width: 100%;
-      height: 100%;
+      max-width: 260px;
+      aspect-ratio: 4/5;
       object-fit: cover;
+      border-radius: var(--radius-lg);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    .founder-card .founder-name {
+      margin-top: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-white);
+    }
+    .founder-card .founder-role {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 2px;
     }
 
     @media (max-width: 768px) {
@@ -162,7 +177,8 @@
       }
       .hero h1 { font-size: 2.25rem; }
       .hero-buttons { justify-content: center; }
-      .hero-image { max-width: 400px; margin: 0 auto; }
+      .hero-founders { flex-direction: row; gap: 16px; }
+      .founder-card img { max-width: 180px; }
     }
 
     /* Section */
@@ -414,8 +430,17 @@
           <a href="#pricing" class="btn btn-secondary">See Pricing</a>
         </div>
       </div>
-      <div class="hero-image">
-        <img src="images/hero.jpg" alt="Current platform preview" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=&quot;padding:40px;text-align:center;color:rgba(255,255,255,0.4)&quot;><div style=&quot;font-size:3rem;margin-bottom:12px&quot;>&#9733;</div><div>Platform Preview</div></div>'">
+      <div class="hero-founders">
+        <div class="founder-card">
+          <img src="images/edmund.png" alt="Edmund Bogen">
+          <div class="founder-name">Edmund Bogen</div>
+          <div class="founder-role">Content & Strategy</div>
+        </div>
+        <div class="founder-card">
+          <img src="images/eytan.png" alt="Eytan Benzeno">
+          <div class="founder-name">Eytan Benzeno</div>
+          <div class="founder-role">Technology & AI</div>
+        </div>
       </div>
     </div>
   </section>
