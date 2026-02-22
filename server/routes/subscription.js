@@ -6,37 +6,11 @@ const { authenticateSubscriber } = require('../middleware/auth');
 const APP_URL = process.env.APP_URL || 'http://localhost:3000';
 
 function getStripe() {
-  return require('stripe')(process.env.STRIPE_SECRET_KEY, {
+  return require('stripe')((process.env.STRIPE_SECRET_KEY || '').trim(), {
     timeout: 30000,
     maxNetworkRetries: 2,
-    httpClient: require('stripe').createNodeHttpClient(),
   });
 }
-
-// GET /stripe-test (temporary diagnostic - remove after debugging)
-router.get('/stripe-test', async (req, res) => {
-  const key = process.env.STRIPE_SECRET_KEY || '';
-  const info = {
-    keyExists: !!key,
-    keyLength: key.length,
-    keyPrefix: key.substring(0, 15),
-    keySuffix: key.substring(key.length - 4),
-    hasWhitespace: key !== key.trim(),
-    nodeVersion: process.version,
-  };
-
-  try {
-    const response = await fetch('https://api.stripe.com/v1/balance', {
-      headers: { 'Authorization': 'Bearer ' + key.trim() }
-    });
-    const body = await response.text();
-    info.fetchTest = { status: response.status, body: body.substring(0, 300) };
-  } catch (fetchErr) {
-    info.fetchTest = { error: fetchErr.message };
-  }
-
-  res.json(info);
-});
 
 // POST /create-checkout-session (no auth - for payment-first flow)
 router.post('/create-checkout-session', async (req, res) => {
