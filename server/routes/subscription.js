@@ -12,6 +12,21 @@ function getStripe() {
   });
 }
 
+// GET /stripe-test (temporary diagnostic - remove after debugging)
+router.get('/stripe-test', async (req, res) => {
+  try {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      return res.json({ error: 'STRIPE_SECRET_KEY is not set', envKeys: Object.keys(process.env).filter(k => k.includes('STRIPE')) });
+    }
+    const s = require('stripe')(key);
+    const balance = await s.balance.retrieve();
+    res.json({ ok: true, keyPrefix: key.substring(0, 12) + '...', balance: balance.available });
+  } catch (error) {
+    res.json({ ok: false, error: error.message, type: error.type, code: error.code });
+  }
+});
+
 // POST /create-checkout-session (no auth - for payment-first flow)
 router.post('/create-checkout-session', async (req, res) => {
   try {
