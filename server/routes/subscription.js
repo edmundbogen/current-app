@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
+  timeout: 30000,
+  maxNetworkRetries: 2,
+});
 const { query } = require('../config/database');
 const { authenticateSubscriber } = require('../middleware/auth');
 
@@ -17,16 +20,26 @@ router.post('/create-checkout-session', async (req, res) => {
     }
 
     // Get price from subscription_plans table (use original casing like existing endpoint)
-    const planResult = await query(
-      'SELECT stripe_price_id FROM subscription_plans WHERE name = $1 AND is_active = true',
-      [plan]
-    );
+    let planResult;
+    try {
+      planResult = await query(
+        'SELECT stripe_price_id FROM subscription_plans WHERE name = $1 AND is_active = true',
+        [plan]
+      );
+    } catch (dbErr) {
+      console.error('DB query failed:', dbErr.message);
+      return res.status(500).json({ error: 'Database error: ' + dbErr.message });
+    }
 
     if (planResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Plan not found' });
+      return res.status(404).json({ error: `Plan "${plan}" not found in database` });
     }
 
     const { stripe_price_id } = planResult.rows[0];
+
+    if (!stripe_price_id) {
+      return res.status(400).json({ error: 'No Stripe price ID configured for this plan' });
+    }
 
     // Use VERCEL_URL in production if APP_URL is localhost
     const baseUrl = (APP_URL.includes('localhost') && process.env.VERCEL_URL)
