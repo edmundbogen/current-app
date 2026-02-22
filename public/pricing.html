@@ -53,8 +53,8 @@
     .pricing-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 30px;
-      max-width: 1000px;
+      gap: 24px;
+      max-width: 1200px;
       margin: 0 auto;
     }
     .pricing-card {
@@ -289,10 +289,22 @@
             <li>AI-powered caption rewriting</li>
             <li>Social media scheduling</li>
             <li>Full branding (colors, logo, photo)</li>
-            <li>Priority email & chat support</li>
-            <li>Advanced analytics dashboard</li>
+            <li>Priority support</li>
           </ul>
           <a href="/register.html" class="btn btn-primary btn-block">Start Free Trial</a>
+        </div>
+        <div class="pricing-card">
+          <h3>Mastermind</h3>
+          <div class="pricing-price">$70<span>/mo</span></div>
+          <p class="pricing-desc">All 6 masterminds + Current access</p>
+          <ul class="pricing-features">
+            <li>Everything in Pro</li>
+            <li>Access to all 6 live masterminds</li>
+            <li>Mastermind session recordings</li>
+            <li>Community networking</li>
+            <li>Priority support</li>
+          </ul>
+          <a href="/register.html" class="btn btn-outline btn-block">Join Mastermind</a>
         </div>
         <div class="pricing-card">
           <h3>Enterprise</h3>
@@ -304,9 +316,34 @@
             <li>Dedicated VA support</li>
             <li>Team management dashboard</li>
             <li>White-label options</li>
-            <li>API access</li>
           </ul>
           <a href="/register.html" class="btn btn-outline btn-block">Contact Sales</a>
+        </div>
+        <div class="pricing-card">
+          <h3>1-on-1 Coaching</h3>
+          <div class="pricing-price">$150<span>/mo</span></div>
+          <p class="pricing-desc">Monthly coaching with Edmund</p>
+          <ul class="pricing-features">
+            <li>Everything in Enterprise</li>
+            <li>1 private coaching session/month</li>
+            <li>Personalized growth strategy</li>
+            <li>Direct access to Edmund</li>
+            <li>Accountability check-ins</li>
+          </ul>
+          <a href="/register.html" class="btn btn-outline btn-block">Book Coaching</a>
+        </div>
+        <div class="pricing-card">
+          <h3>1-on-1 Coaching 2x</h3>
+          <div class="pricing-price">$300<span>/mo</span></div>
+          <p class="pricing-desc">Semi-monthly coaching with Edmund</p>
+          <ul class="pricing-features">
+            <li>Everything in Enterprise</li>
+            <li>2 private coaching sessions/month</li>
+            <li>Personalized growth strategy</li>
+            <li>Direct access to Edmund</li>
+            <li>Priority scheduling</li>
+          </ul>
+          <a href="/register.html" class="btn btn-outline btn-block">Book Coaching</a>
         </div>
       </div>
     </div>
@@ -320,13 +357,17 @@
           <tr>
             <th>Feature</th>
             <th>Free</th>
-            <th>Pro</th>
-            <th>Enterprise</th>
+            <th>Pro $29</th>
+            <th>Mastermind $70</th>
+            <th>Enterprise $79</th>
+            <th>Coaching $150+</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>Content library access</td>
+            <td><span class="check">&#10003;</span></td>
+            <td><span class="check">&#10003;</span></td>
             <td><span class="check">&#10003;</span></td>
             <td><span class="check">&#10003;</span></td>
             <td><span class="check">&#10003;</span></td>
@@ -336,16 +377,14 @@
             <td>5</td>
             <td>Unlimited</td>
             <td>Unlimited</td>
-          </tr>
-          <tr>
-            <td>Basic personalization</td>
-            <td><span class="check">&#10003;</span></td>
-            <td><span class="check">&#10003;</span></td>
-            <td><span class="check">&#10003;</span></td>
+            <td>Unlimited</td>
+            <td>Unlimited</td>
           </tr>
           <tr>
             <td>Full branding (logo, colors)</td>
             <td><span class="cross">&#10007;</span></td>
+            <td><span class="check">&#10003;</span></td>
+            <td><span class="check">&#10003;</span></td>
             <td><span class="check">&#10003;</span></td>
             <td><span class="check">&#10003;</span></td>
           </tr>
@@ -354,54 +393,64 @@
             <td><span class="cross">&#10007;</span></td>
             <td><span class="check">&#10003;</span></td>
             <td><span class="check">&#10003;</span></td>
+            <td><span class="check">&#10003;</span></td>
+            <td><span class="check">&#10003;</span></td>
           </tr>
           <tr>
             <td>Social media scheduling</td>
             <td><span class="cross">&#10007;</span></td>
             <td><span class="check">&#10003;</span></td>
             <td><span class="check">&#10003;</span></td>
+            <td><span class="check">&#10003;</span></td>
+            <td><span class="check">&#10003;</span></td>
           </tr>
           <tr>
-            <td>Analytics dashboard</td>
+            <td>All 6 live masterminds</td>
+            <td><span class="cross">&#10007;</span></td>
             <td><span class="cross">&#10007;</span></td>
             <td><span class="check">&#10003;</span></td>
+            <td><span class="cross">&#10007;</span></td>
             <td><span class="check">&#10003;</span></td>
           </tr>
           <tr>
             <td>Custom templates</td>
             <td><span class="cross">&#10007;</span></td>
             <td><span class="cross">&#10007;</span></td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="check">&#10003;</span></td>
             <td><span class="check">&#10003;</span></td>
           </tr>
           <tr>
-            <td>Dedicated VA support</td>
+            <td>VA support</td>
             <td><span class="cross">&#10007;</span></td>
             <td><span class="cross">&#10007;</span></td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="check">&#10003;</span></td>
             <td><span class="check">&#10003;</span></td>
           </tr>
           <tr>
             <td>Team management</td>
             <td><span class="cross">&#10007;</span></td>
             <td><span class="cross">&#10007;</span></td>
+            <td><span class="cross">&#10007;</span></td>
+            <td><span class="check">&#10003;</span></td>
             <td><span class="check">&#10003;</span></td>
           </tr>
           <tr>
-            <td>White-label</td>
+            <td>1-on-1 coaching with Edmund</td>
             <td><span class="cross">&#10007;</span></td>
             <td><span class="cross">&#10007;</span></td>
-            <td><span class="check">&#10003;</span></td>
-          </tr>
-          <tr>
-            <td>API access</td>
             <td><span class="cross">&#10007;</span></td>
             <td><span class="cross">&#10007;</span></td>
-            <td><span class="check">&#10003;</span></td>
+            <td>1-2x/month</td>
           </tr>
           <tr>
             <td>Support</td>
             <td>Email</td>
-            <td>Priority email & chat</td>
-            <td>Dedicated account manager</td>
+            <td>Priority</td>
+            <td>Priority</td>
+            <td>Dedicated</td>
+            <td>Direct access</td>
           </tr>
         </tbody>
       </table>

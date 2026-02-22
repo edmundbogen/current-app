@@ -164,11 +164,14 @@ CREATE INDEX IF NOT EXISTS idx_scheduled_posts_scheduled_status ON scheduled_pos
 CREATE INDEX IF NOT EXISTS idx_usage_logs_subscriber_period ON usage_logs(subscriber_id, period);
 
 -- Default subscription plans
-INSERT INTO subscription_plans (name, price_cents, downloads_per_month, ai_rewrite, custom_templates, description)
+INSERT INTO subscription_plans (name, stripe_price_id, price_cents, downloads_per_month, ai_rewrite, custom_templates, description)
 VALUES
-    ('Free', 0, 5, false, false, 'Basic access with 5 downloads per month'),
-    ('Pro', 2900, NULL, true, false, 'Unlimited downloads with AI rewrite'),
-    ('Enterprise', 7900, NULL, true, true, 'Unlimited downloads, custom templates, and AI rewrite')
+    ('Free', NULL, 0, 5, false, false, 'Basic access with 5 downloads per month'),
+    ('Pro', 'price_1T3fu9F9Tzumynw9dZmmuPeO', 2900, NULL, true, false, 'Unlimited downloads with AI rewrite'),
+    ('Mastermind', 'price_1T3gKyF9Tzumynw9WUAkgkEh', 7000, NULL, true, false, 'All 6 masterminds plus Current access'),
+    ('Enterprise', 'price_1T3fxRF9Tzumynw9FjipRvR5', 7900, NULL, true, true, 'Unlimited downloads, custom templates, and AI rewrite'),
+    ('Coaching', 'price_1T3gYAF9Tzumynw9c8YCZeQE', 15000, NULL, true, true, '1-on-1 coaching session per month plus full platform access'),
+    ('Coaching 2x', 'price_1T3gzKF9Tzumynw9zdwqNp2s', 30000, NULL, true, true, '2 coaching sessions per month plus full platform access')
 ON CONFLICT DO NOTHING;
 
 -- Default invite code

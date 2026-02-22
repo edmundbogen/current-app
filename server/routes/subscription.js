@@ -11,8 +11,9 @@ router.post('/create-checkout', authenticateSubscriber, async (req, res) => {
   try {
     const { plan } = req.body;
 
-    if (!plan || !['pro', 'enterprise'].includes(plan)) {
-      return res.status(400).json({ error: 'Invalid plan. Must be pro or enterprise' });
+    const validPlans = ['pro', 'mastermind', 'enterprise', 'coaching', 'coaching 2x'];
+    if (!plan || !validPlans.includes(plan.toLowerCase())) {
+      return res.status(400).json({ error: `Invalid plan. Must be one of: ${validPlans.join(', ')}` });
     }
 
     // Get price from subscription_plans table
