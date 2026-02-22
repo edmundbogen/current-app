@@ -16,10 +16,10 @@ router.post('/create-checkout-session', async (req, res) => {
       return res.status(400).json({ error: `Invalid plan. Must be one of: ${validPlans.join(', ')}` });
     }
 
-    // Get price from subscription_plans table
+    // Get price from subscription_plans table (use original casing like existing endpoint)
     const planResult = await query(
-      'SELECT stripe_price_id FROM subscription_plans WHERE LOWER(name) = $1 AND is_active = true',
-      [plan.toLowerCase()]
+      'SELECT stripe_price_id FROM subscription_plans WHERE name = $1 AND is_active = true',
+      [plan]
     );
 
     if (planResult.rows.length === 0) {
@@ -28,19 +28,24 @@ router.post('/create-checkout-session', async (req, res) => {
 
     const { stripe_price_id } = planResult.rows[0];
 
+    // Use VERCEL_URL in production if APP_URL is localhost
+    const baseUrl = (APP_URL.includes('localhost') && process.env.VERCEL_URL)
+      ? `https://${process.env.VERCEL_URL}`
+      : APP_URL;
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{ price: stripe_price_id, quantity: 1 }],
       mode: 'subscription',
-      success_url: `${APP_URL}/create-account?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${APP_URL}/pricing`,
+      success_url: `${baseUrl}/create-account?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/pricing`,
       metadata: { plan: plan },
     });
 
     res.json({ url: session.url });
   } catch (error) {
-    console.error('Create checkout session error:', error);
-    res.status(500).json({ error: 'Failed to create checkout session' });
+    console.error('Create checkout session error:', error.message || error);
+    res.status(500).json({ error: error.message || 'Failed to create checkout session' });
   }
 });
 
