@@ -62,6 +62,10 @@ app.get('/pricing', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'pricing.html'));
 });
 
+app.get('/create-account', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'create-account.html'));
+});
+
 app.get('/app', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'app', 'index.html'));
 });

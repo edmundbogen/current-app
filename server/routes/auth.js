@@ -91,6 +91,94 @@ router.post('/subscriber/register', async (req, res) => {
   }
 });
 
+// POST /subscriber/register-after-checkout (payment-first flow)
+router.post('/subscriber/register-after-checkout', async (req, res) => {
+  try {
+    const { session_id, password, phone, company } = req.body;
+
+    if (!session_id || !password) {
+      return res.status(400).json({ error: 'Session ID and password are required' });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    }
+
+    // Retrieve Stripe checkout session
+    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    const session = await stripe.checkout.sessions.retrieve(session_id);
+
+    if (session.payment_status !== 'paid') {
+      return res.status(400).json({ error: 'Payment not completed' });
+    }
+
+    const email = session.customer_details?.email;
+    const name = session.customer_details?.name;
+
+    if (!email || !name) {
+      return res.status(400).json({ error: 'Could not retrieve customer details from payment session' });
+    }
+
+    // Check if email already exists
+    const existing = await query('SELECT subscriber_id FROM subscribers WHERE email = $1', [email.toLowerCase()]);
+    if (existing.rows.length > 0) {
+      return res.status(409).json({ error: 'Email already registered. Please login instead.' });
+    }
+
+    // Determine tier from subscription
+    const subscription = await stripe.subscriptions.retrieve(session.subscription);
+    const priceId = subscription.items.data[0].price.id;
+
+    const planResult = await query(
+      'SELECT name FROM subscription_plans WHERE stripe_price_id = $1',
+      [priceId]
+    );
+    const tier = planResult.rows.length > 0 ? planResult.rows[0].name : 'pro';
+
+    // Hash password and create subscriber
+    const password_hash = await bcrypt.hash(password, 10);
+
+    const result = await query(
+      `INSERT INTO subscribers (name, email, password_hash, phone, company, stripe_customer_id, stripe_subscription_id, subscription_tier)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING subscriber_id, name, email, subscription_tier, mastermind_member`,
+      [name, email.toLowerCase(), password_hash, phone || null, company || null, session.customer, session.subscription, tier]
+    );
+
+    const subscriber = result.rows[0];
+
+    // Generate token
+    const token = generateToken({
+      id: subscriber.subscriber_id,
+      email: subscriber.email,
+      name: subscriber.name,
+      type: 'subscriber',
+    });
+
+    // Set cookie
+    res.cookie('subscriber_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(201).json({
+      token,
+      subscriber: {
+        id: subscriber.subscriber_id,
+        name: subscriber.name,
+        email: subscriber.email,
+        subscription_tier: subscriber.subscription_tier,
+        mastermind_member: subscriber.mastermind_member,
+      }
+    });
+  } catch (error) {
+    console.error('Register after checkout error:', error);
+    res.status(500).json({ error: 'Registration failed' });
+  }
+});
+
 // POST /subscriber/login
 router.post('/subscriber/login', async (req, res) => {
   try {

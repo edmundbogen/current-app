@@ -6,7 +6,78 @@ const { authenticateSubscriber } = require('../middleware/auth');
 
 const APP_URL = process.env.APP_URL || 'http://localhost:3000';
 
-// POST /create-checkout
+// POST /create-checkout-session (no auth - for payment-first flow)
+router.post('/create-checkout-session', async (req, res) => {
+  try {
+    const { plan } = req.body;
+
+    const validPlans = ['pro', 'mastermind', 'enterprise', 'coaching', 'coaching 2x'];
+    if (!plan || !validPlans.includes(plan.toLowerCase())) {
+      return res.status(400).json({ error: `Invalid plan. Must be one of: ${validPlans.join(', ')}` });
+    }
+
+    // Get price from subscription_plans table
+    const planResult = await query(
+      'SELECT stripe_price_id FROM subscription_plans WHERE LOWER(name) = $1 AND is_active = true',
+      [plan.toLowerCase()]
+    );
+
+    if (planResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Plan not found' });
+    }
+
+    const { stripe_price_id } = planResult.rows[0];
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [{ price: stripe_price_id, quantity: 1 }],
+      mode: 'subscription',
+      success_url: `${APP_URL}/create-account?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${APP_URL}/pricing`,
+      metadata: { plan: plan },
+    });
+
+    res.json({ url: session.url });
+  } catch (error) {
+    console.error('Create checkout session error:', error);
+    res.status(500).json({ error: 'Failed to create checkout session' });
+  }
+});
+
+// GET /checkout-session/:sessionId (no auth - retrieve session for account creation)
+router.get('/checkout-session/:sessionId', async (req, res) => {
+  try {
+    const session = await stripe.checkout.sessions.retrieve(req.params.sessionId);
+
+    if (session.payment_status !== 'paid') {
+      return res.status(400).json({ error: 'Payment not completed' });
+    }
+
+    // Get subscription to determine tier
+    const subscription = await stripe.subscriptions.retrieve(session.subscription);
+    const priceId = subscription.items.data[0].price.id;
+
+    const planResult = await query(
+      'SELECT name FROM subscription_plans WHERE stripe_price_id = $1',
+      [priceId]
+    );
+
+    const tier = planResult.rows.length > 0 ? planResult.rows[0].name : 'pro';
+
+    res.json({
+      email: session.customer_details?.email || '',
+      name: session.customer_details?.name || '',
+      plan: tier,
+      stripe_customer_id: session.customer,
+      stripe_subscription_id: session.subscription,
+    });
+  } catch (error) {
+    console.error('Get checkout session error:', error);
+    res.status(500).json({ error: 'Failed to retrieve checkout session' });
+  }
+});
+
+// POST /create-checkout (existing - requires auth, for upgrades)
 router.post('/create-checkout', authenticateSubscriber, async (req, res) => {
   try {
     const { plan } = req.body;

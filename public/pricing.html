@@ -291,7 +291,7 @@
             <li>Full branding (colors, logo, photo)</li>
             <li>Priority support</li>
           </ul>
-          <a href="/register.html" class="btn btn-primary btn-block">Start Free Trial</a>
+          <a href="#" class="btn btn-primary btn-block checkout-btn" data-plan="Pro">Start Free Trial</a>
         </div>
         <div class="pricing-card">
           <h3>Mastermind</h3>
@@ -304,7 +304,7 @@
             <li>Community networking</li>
             <li>Priority support</li>
           </ul>
-          <a href="/register.html" class="btn btn-outline btn-block">Join Mastermind</a>
+          <a href="#" class="btn btn-outline btn-block checkout-btn" data-plan="Mastermind">Join Mastermind</a>
         </div>
         <div class="pricing-card">
           <h3>Enterprise</h3>
@@ -317,7 +317,7 @@
             <li>Team management dashboard</li>
             <li>White-label options</li>
           </ul>
-          <a href="/register.html" class="btn btn-outline btn-block">Contact Sales</a>
+          <a href="#" class="btn btn-outline btn-block checkout-btn" data-plan="Enterprise">Contact Sales</a>
         </div>
         <div class="pricing-card">
           <h3>1-on-1 Coaching</h3>
@@ -330,7 +330,7 @@
             <li>Direct access to Edmund</li>
             <li>Accountability check-ins</li>
           </ul>
-          <a href="/register.html" class="btn btn-outline btn-block">Book Coaching</a>
+          <a href="#" class="btn btn-outline btn-block checkout-btn" data-plan="Coaching">Book Coaching</a>
         </div>
         <div class="pricing-card">
           <h3>1-on-1 Coaching 2x</h3>
@@ -343,7 +343,7 @@
             <li>Direct access to Edmund</li>
             <li>Priority scheduling</li>
           </ul>
-          <a href="/register.html" class="btn btn-outline btn-block">Book Coaching</a>
+          <a href="#" class="btn btn-outline btn-block checkout-btn" data-plan="Coaching 2x">Book Coaching</a>
         </div>
       </div>
     </div>
@@ -533,5 +533,38 @@
     </div>
   </footer>
 
+  <script>
+    document.querySelectorAll('.checkout-btn').forEach(function(btn) {
+      btn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        const plan = this.dataset.plan;
+        this.textContent = 'Redirecting...';
+        this.style.pointerEvents = 'none';
+
+        try {
+          const res = await fetch('/api/subscription/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ plan })
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.error || 'Failed to start checkout');
+          }
+
+          window.location.href = data.url;
+        } catch (err) {
+          alert(err.message);
+          this.textContent = this.getAttribute('data-original-text') || 'Subscribe';
+          this.style.pointerEvents = '';
+        }
+      });
+
+      // Store original text for error recovery
+      btn.setAttribute('data-original-text', btn.textContent);
+    });
+  </script>
 </body>
 </html>

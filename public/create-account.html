@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete Your Account - Current</title>
+  <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card" style="max-width:500px">
+      <div class="logo">
+        <h1><a href="/" style="color:inherit;text-decoration:none">Current<span>.</span></a></h1>
+      </div>
+      <h2>Complete Your Account</h2>
+      <p class="subtitle">Payment confirmed! Set your password to finish setup.</p>
+
+      <div class="alert alert-error" id="errorAlert"></div>
+      <div class="alert alert-success" id="successAlert"></div>
+
+      <div id="loadingState" style="text-align:center;padding:40px 0;">
+        <p>Verifying your payment...</p>
+      </div>
+
+      <form id="createAccountForm" novalidate style="display:none">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" class="form-control" readonly style="background:var(--color-light-gray)">
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" class="form-control" readonly style="background:var(--color-light-gray)">
+        </div>
+        <div class="form-group">
+          <label for="plan">Plan</label>
+          <input type="text" id="plan" class="form-control" readonly style="background:var(--color-light-gray)">
+        </div>
+        <div class="form-group">
+          <label for="password">Password *</label>
+          <input type="password" id="password" class="form-control" placeholder="At least 8 characters" required autocomplete="new-password">
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password *</label>
+          <input type="password" id="confirmPassword" class="form-control" placeholder="Re-enter your password" required autocomplete="new-password">
+          <div class="form-error hidden" id="passwordError">Passwords do not match</div>
+        </div>
+        <div class="form-group">
+          <label for="company">Company <span style="font-weight:400;color:var(--color-mid-gray)">(optional)</span></label>
+          <input type="text" id="company" class="form-control" placeholder="Your brokerage or company" autocomplete="organization">
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone <span style="font-weight:400;color:var(--color-mid-gray)">(optional)</span></label>
+          <input type="tel" id="phone" class="form-control" placeholder="(555) 123-4567" autocomplete="tel">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitBtn">Create Account</button>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? <a href="/login.html">Login</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
+
+    const form = document.getElementById('createAccountForm');
+    const loadingState = document.getElementById('loadingState');
+    const errorAlert = document.getElementById('errorAlert');
+    const successAlert = document.getElementById('successAlert');
+    const submitBtn = document.getElementById('submitBtn');
+    const passwordError = document.getElementById('passwordError');
+    const passwordField = document.getElementById('password');
+    const confirmField = document.getElementById('confirmPassword');
+
+    function showError(msg) {
+      errorAlert.textContent = msg;
+      errorAlert.classList.add('show');
+      successAlert.classList.remove('show');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showSuccess(msg) {
+      successAlert.textContent = msg;
+      successAlert.classList.add('show');
+      errorAlert.classList.remove('show');
+    }
+
+    // Live password match validation
+    confirmField.addEventListener('input', function() {
+      if (this.value && this.value !== passwordField.value) {
+        passwordError.classList.remove('hidden');
+        this.classList.add('error');
+      } else {
+        passwordError.classList.add('hidden');
+        this.classList.remove('error');
+      }
+    });
+
+    // Verify the checkout session on page load
+    async function verifySession() {
+      if (!sessionId) {
+        loadingState.innerHTML = '<p style="color:var(--color-danger)">No payment session found. <a href="/pricing">Return to pricing</a></p>';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/subscription/checkout-session/' + sessionId);
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Could not verify payment');
+        }
+
+        document.getElementById('name').value = data.name;
+        document.getElementById('email').value = data.email;
+        document.getElementById('plan').value = data.plan;
+
+        loadingState.style.display = 'none';
+        form.style.display = 'block';
+      } catch (err) {
+        loadingState.innerHTML = '<p style="color:var(--color-danger)">' + err.message + '. <a href="/pricing">Return to pricing</a></p>';
+      }
+    }
+
+    verifySession();
+
+    // Handle form submission
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const password = passwordField.value;
+      const confirmPassword = confirmField.value;
+      const company = document.getElementById('company').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+
+      if (!password || !confirmPassword) {
+        showError('Please fill in all required fields.');
+        return;
+      }
+
+      if (password.length < 8) {
+        showError('Password must be at least 8 characters.');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showError('Passwords do not match.');
+        confirmField.classList.add('error');
+        passwordError.classList.remove('hidden');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating account...';
+
+      try {
+        const body = { session_id: sessionId, password };
+        if (company) body.company = company;
+        if (phone) body.phone = phone;
+
+        const res = await fetch('/api/auth/subscriber/register-after-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Registration failed');
+        }
+
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+
+        showSuccess('Account created! Redirecting to your dashboard...');
+        setTimeout(function() {
+          window.location.href = '/app';
+        }, 500);
+
+      } catch (err) {
+        showError(err.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Account';
+      }
+    });
+
+    // If already logged in, go to app
+    if (localStorage.getItem('token')) {
+      window.location.href = '/app';
+    }
+  </script>
+</body>
+</html>
