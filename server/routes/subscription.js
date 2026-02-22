@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
-  timeout: 30000,
-  maxNetworkRetries: 2,
-});
 const { query } = require('../config/database');
 const { authenticateSubscriber } = require('../middleware/auth');
 
 const APP_URL = process.env.APP_URL || 'http://localhost:3000';
+
+function getStripe() {
+  return require('stripe')(process.env.STRIPE_SECRET_KEY, {
+    timeout: 30000,
+    maxNetworkRetries: 2,
+  });
+}
 
 // POST /create-checkout-session (no auth - for payment-first flow)
 router.post('/create-checkout-session', async (req, res) => {
@@ -46,7 +49,7 @@ router.post('/create-checkout-session', async (req, res) => {
       ? `https://${process.env.VERCEL_URL}`
       : APP_URL;
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{ price: stripe_price_id, quantity: 1 }],
       mode: 'subscription',
@@ -65,14 +68,14 @@ router.post('/create-checkout-session', async (req, res) => {
 // GET /checkout-session/:sessionId (no auth - retrieve session for account creation)
 router.get('/checkout-session/:sessionId', async (req, res) => {
   try {
-    const session = await stripe.checkout.sessions.retrieve(req.params.sessionId);
+    const session = await getStripe().checkout.sessions.retrieve(req.params.sessionId);
 
     if (session.payment_status !== 'paid') {
       return res.status(400).json({ error: 'Payment not completed' });
     }
 
     // Get subscription to determine tier
-    const subscription = await stripe.subscriptions.retrieve(session.subscription);
+    const subscription = await getStripe().subscriptions.retrieve(session.subscription);
     const priceId = subscription.items.data[0].price.id;
 
     const planResult = await query(
@@ -141,7 +144,7 @@ router.post('/create-checkout', authenticateSubscriber, async (req, res) => {
       sessionConfig.customer_email = subscriber.email;
     }
 
-    const session = await stripe.checkout.sessions.create(sessionConfig);
+    const session = await getStripe().checkout.sessions.create(sessionConfig);
 
     res.json({ url: session.url });
   } catch (error) {
@@ -156,7 +159,7 @@ router.post('/webhook', async (req, res) => {
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = getStripe().webhooks.constructEvent(
       req.body,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
@@ -174,7 +177,7 @@ router.post('/webhook', async (req, res) => {
 
         if (subscriberId) {
           // Get subscription details to determine tier
-          const subscription = await stripe.subscriptions.retrieve(session.subscription);
+          const subscription = await getStripe().subscriptions.retrieve(session.subscription);
           const priceId = subscription.items.data[0].price.id;
 
           // Look up which tier this price corresponds to
@@ -292,7 +295,7 @@ router.post('/portal', authenticateSubscriber, async (req, res) => {
       return res.status(400).json({ error: 'No active subscription found' });
     }
 
-    const portalSession = await stripe.billingPortal.sessions.create({
+    const portalSession = await getStripe().billingPortal.sessions.create({
       customer: subscriber.stripe_customer_id,
       return_url: `${APP_URL}/app`,
     });
