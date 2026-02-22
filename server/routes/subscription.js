@@ -15,31 +15,27 @@ function getStripe() {
 
 // GET /stripe-test (temporary diagnostic - remove after debugging)
 router.get('/stripe-test', async (req, res) => {
+  const key = process.env.STRIPE_SECRET_KEY || '';
+  const info = {
+    keyExists: !!key,
+    keyLength: key.length,
+    keyPrefix: key.substring(0, 15),
+    keySuffix: key.substring(key.length - 4),
+    hasWhitespace: key !== key.trim(),
+    nodeVersion: process.version,
+  };
+
   try {
-    const key = process.env.STRIPE_SECRET_KEY;
-    if (!key) {
-      return res.json({ error: 'STRIPE_SECRET_KEY is not set', envKeys: Object.keys(process.env).filter(k => k.includes('STRIPE')) });
-    }
-    const keyInfo = { length: key.length, prefix: key.substring(0, 15), suffix: key.substring(key.length - 4), hasWhitespace: key !== key.trim() };
-
-    // Try raw https request to Stripe as fallback test
-    const https = require('https');
-    const rawTest = await new Promise((resolve, reject) => {
-      const req = https.get('https://api.stripe.com/v1/balance', {
-        headers: { 'Authorization': 'Bearer ' + key.trim() }
-      }, (resp) => {
-        let data = '';
-        resp.on('data', chunk => data += chunk);
-        resp.on('end', () => resolve({ status: resp.statusCode, body: data.substring(0, 200) }));
-      });
-      req.on('error', e => resolve({ error: e.message }));
-      req.setTimeout(10000, () => { req.destroy(); resolve({ error: 'timeout' }); });
+    const response = await fetch('https://api.stripe.com/v1/balance', {
+      headers: { 'Authorization': 'Bearer ' + key.trim() }
     });
-
-    res.json({ keyInfo, rawTest });
-  } catch (error) {
-    res.json({ ok: false, error: error.message, type: error.type });
+    const body = await response.text();
+    info.fetchTest = { status: response.status, body: body.substring(0, 300) };
+  } catch (fetchErr) {
+    info.fetchTest = { error: fetchErr.message };
   }
+
+  res.json(info);
 });
 
 // POST /create-checkout-session (no auth - for payment-first flow)
