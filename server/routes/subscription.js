@@ -20,11 +20,25 @@ router.get('/stripe-test', async (req, res) => {
     if (!key) {
       return res.json({ error: 'STRIPE_SECRET_KEY is not set', envKeys: Object.keys(process.env).filter(k => k.includes('STRIPE')) });
     }
-    const s = require('stripe')(key, { httpClient: require('stripe').createNodeHttpClient() });
-    const balance = await s.balance.retrieve();
-    res.json({ ok: true, keyPrefix: key.substring(0, 12) + '...', balance: balance.available });
+    const keyInfo = { length: key.length, prefix: key.substring(0, 15), suffix: key.substring(key.length - 4), hasWhitespace: key !== key.trim() };
+
+    // Try raw https request to Stripe as fallback test
+    const https = require('https');
+    const rawTest = await new Promise((resolve, reject) => {
+      const req = https.get('https://api.stripe.com/v1/balance', {
+        headers: { 'Authorization': 'Bearer ' + key.trim() }
+      }, (resp) => {
+        let data = '';
+        resp.on('data', chunk => data += chunk);
+        resp.on('end', () => resolve({ status: resp.statusCode, body: data.substring(0, 200) }));
+      });
+      req.on('error', e => resolve({ error: e.message }));
+      req.setTimeout(10000, () => { req.destroy(); resolve({ error: 'timeout' }); });
+    });
+
+    res.json({ keyInfo, rawTest });
   } catch (error) {
-    res.json({ ok: false, error: error.message, type: error.type, code: error.code });
+    res.json({ ok: false, error: error.message, type: error.type });
   }
 });
 
