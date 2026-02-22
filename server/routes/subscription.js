@@ -9,6 +9,7 @@ function getStripe() {
   return require('stripe')(process.env.STRIPE_SECRET_KEY, {
     timeout: 30000,
     maxNetworkRetries: 2,
+    httpClient: require('stripe').createNodeHttpClient(),
   });
 }
 
@@ -19,7 +20,7 @@ router.get('/stripe-test', async (req, res) => {
     if (!key) {
       return res.json({ error: 'STRIPE_SECRET_KEY is not set', envKeys: Object.keys(process.env).filter(k => k.includes('STRIPE')) });
     }
-    const s = require('stripe')(key);
+    const s = require('stripe')(key, { httpClient: require('stripe').createNodeHttpClient() });
     const balance = await s.balance.retrieve();
     res.json({ ok: true, keyPrefix: key.substring(0, 12) + '...', balance: balance.available });
   } catch (error) {
