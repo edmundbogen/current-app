@@ -267,7 +267,6 @@ async function handleContentSubmit(e) {
   const status = document.getElementById('cf-status').value;
   const vertical = document.getElementById('cf-vertical').value;
 
-  // Build payload matching the server route expectations
   const payload = {
     title,
     content_type,
@@ -276,22 +275,12 @@ async function handleContentSubmit(e) {
     template_id: template_id ? parseInt(template_id) : null,
     status,
     thumbnail_url: thumbnail_url || null,
-    description: description || null,
-    body: article_body || null,
-    // Store captions in meta for now, and also as direct fields
-    // The server route uses description/body, but we also pass caption fields
-    // in case the route supports them
     caption_facebook: caption_facebook || null,
     caption_instagram: caption_instagram || null,
     caption_twitter: caption_twitter || null,
     caption_linkedin: caption_linkedin || null,
-    meta: {
-      tags,
-      caption_facebook: caption_facebook || null,
-      caption_instagram: caption_instagram || null,
-      caption_twitter: caption_twitter || null,
-      caption_linkedin: caption_linkedin || null,
-    },
+    article_body: article_body || null,
+    tags: tags.length > 0 ? tags : null,
   };
 
   try {
@@ -332,13 +321,6 @@ async function editContent(id) {
     const data = await res.json();
     const item = data.items?.find(i => i.content_id === id);
     if (item) {
-      // Restore caption data from meta if available
-      if (item.meta) {
-        if (!item.caption_facebook && item.meta.caption_facebook) item.caption_facebook = item.meta.caption_facebook;
-        if (!item.caption_instagram && item.meta.caption_instagram) item.caption_instagram = item.meta.caption_instagram;
-        if (!item.caption_twitter && item.meta.caption_twitter) item.caption_twitter = item.meta.caption_twitter;
-        if (!item.caption_linkedin && item.meta.caption_linkedin) item.caption_linkedin = item.meta.caption_linkedin;
-      }
       showContentForm(item);
     } else {
       showToast('Content item not found', 'error');

@@ -133,8 +133,9 @@ router.post('/',
 
     try {
       const {
-        title, content_type, description, body: contentBody, category, vertical,
-        template_id, status, thumbnail_url, meta
+        title, content_type, category, vertical,
+        caption_facebook, caption_instagram, caption_twitter, caption_linkedin,
+        article_body, template_id, status, thumbnail_url, tags
       } = req.body;
 
       const slug = title
@@ -145,11 +146,13 @@ router.post('/',
         .replace(/^-|-$/g, '');
 
       const result = await query(
-        `INSERT INTO content_items (title, slug, content_type, description, body, category, vertical, template_id, status, thumbnail_url, meta)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        `INSERT INTO content_items (title, slug, content_type, caption_facebook, caption_instagram, caption_twitter, caption_linkedin, article_body, category, vertical, template_id, status, featured_image_url, tags)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
          RETURNING content_id, slug`,
-        [title, slug, content_type, description || null, contentBody || null, category || null,
-         vertical || null, template_id || null, status || 'draft', thumbnail_url || null, meta || null]
+        [title, slug, content_type,
+         caption_facebook || null, caption_instagram || null, caption_twitter || null, caption_linkedin || null,
+         article_body || null, category || null, vertical || null,
+         template_id || null, status || 'draft', thumbnail_url || null, tags || null]
       );
 
       res.status(201).json({
@@ -158,7 +161,7 @@ router.post('/',
       });
     } catch (error) {
       console.error('Error creating content:', error);
-      if (error.code === '23505') {
+      if (error.message && error.message.includes('unique')) {
         return res.status(409).json({ error: 'Content with this slug already exists' });
       }
       res.status(500).json({ error: 'Failed to create content' });
@@ -179,28 +182,33 @@ router.put('/:id',
     try {
       const { id } = req.params;
       const {
-        title, content_type, description, body: contentBody, category, vertical,
-        template_id, status, thumbnail_url, meta
+        title, content_type, category, vertical,
+        caption_facebook, caption_instagram, caption_twitter, caption_linkedin,
+        article_body, template_id, status, thumbnail_url, tags
       } = req.body;
 
       const result = await query(
         `UPDATE content_items SET
           title = COALESCE($1, title),
           content_type = COALESCE($2, content_type),
-          description = COALESCE($3, description),
-          body = COALESCE($4, body),
-          category = COALESCE($5, category),
-          vertical = COALESCE($6, vertical),
-          template_id = COALESCE($7, template_id),
-          status = COALESCE($8, status),
-          thumbnail_url = COALESCE($9, thumbnail_url),
-          meta = COALESCE($10, meta),
+          caption_facebook = COALESCE($3, caption_facebook),
+          caption_instagram = COALESCE($4, caption_instagram),
+          caption_twitter = COALESCE($5, caption_twitter),
+          caption_linkedin = COALESCE($6, caption_linkedin),
+          article_body = COALESCE($7, article_body),
+          category = COALESCE($8, category),
+          vertical = COALESCE($9, vertical),
+          template_id = COALESCE($10, template_id),
+          status = COALESCE($11, status),
+          featured_image_url = COALESCE($12, featured_image_url),
+          tags = COALESCE($13, tags),
           updated_at = NOW()
-         WHERE content_id = $11
+         WHERE content_id = $14
          RETURNING content_id, slug`,
-        [title || null, content_type || null, description || null, contentBody || null,
-         category || null, vertical || null, template_id || null, status || null,
-         thumbnail_url || null, meta || null, id]
+        [title || null, content_type || null,
+         caption_facebook || null, caption_instagram || null, caption_twitter || null, caption_linkedin || null,
+         article_body || null, category || null, vertical || null,
+         template_id || null, status || null, thumbnail_url || null, tags || null, id]
       );
 
       if (result.rows.length === 0) {
