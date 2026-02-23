@@ -180,8 +180,8 @@ router.post('/subscriber/register-after-checkout', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Register after checkout error:', error);
-    res.status(500).json({ error: 'Registration failed' });
+    console.error('Register after checkout error:', error.message || error);
+    res.status(500).json({ error: 'Registration failed: ' + (error.message || 'Unknown error') });
   }
 });
 
