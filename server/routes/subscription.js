@@ -175,19 +175,19 @@ router.post('/webhook', async (req, res) => {
         const session = event.data.object;
         const subscriberId = session.client_reference_id || session.metadata?.subscriber_id;
 
+        // Get subscription details to determine tier
+        const subscription = await getStripe().subscriptions.retrieve(session.subscription);
+        const priceId = subscription.items.data[0].price.id;
+
+        const planResult = await query(
+          'SELECT name FROM subscription_plans WHERE stripe_price_id = $1',
+          [priceId]
+        );
+
+        const tier = planResult.rows.length > 0 ? planResult.rows[0].name : 'pro';
+
         if (subscriberId) {
-          // Get subscription details to determine tier
-          const subscription = await getStripe().subscriptions.retrieve(session.subscription);
-          const priceId = subscription.items.data[0].price.id;
-
-          // Look up which tier this price corresponds to
-          const planResult = await query(
-            'SELECT name FROM subscription_plans WHERE stripe_price_id = $1',
-            [priceId]
-          );
-
-          const tier = planResult.rows.length > 0 ? planResult.rows[0].name : 'pro';
-
+          // Existing subscriber (upgrade flow) — update their record
           await query(
             `UPDATE subscribers
              SET stripe_customer_id = $1, stripe_subscription_id = $2, subscription_tier = $3
@@ -195,6 +195,24 @@ router.post('/webhook', async (req, res) => {
             [session.customer, session.subscription, tier, subscriberId]
           );
         }
+
+        // Always log to pending_checkouts as a safety net
+        await query(
+          `INSERT INTO pending_checkouts
+             (stripe_session_id, stripe_customer_id, stripe_subscription_id, email, name, plan, amount_cents, completed_at, account_created)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8)
+           ON CONFLICT (stripe_session_id) DO NOTHING`,
+          [
+            session.id,
+            session.customer,
+            session.subscription,
+            session.customer_details?.email || '',
+            session.customer_details?.name || '',
+            tier,
+            session.amount_total || 0,
+            !!subscriberId, // already has an account if subscriberId exists
+          ]
+        );
         break;
       }
 

@@ -105,7 +105,7 @@ router.post('/subscriber/register-after-checkout', async (req, res) => {
     }
 
     // Retrieve Stripe checkout session
-    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    const stripe = require('stripe')((process.env.STRIPE_SECRET_KEY || '').trim());
     const session = await stripe.checkout.sessions.retrieve(session_id);
 
     if (session.payment_status !== 'paid') {
@@ -146,6 +146,12 @@ router.post('/subscriber/register-after-checkout', async (req, res) => {
     );
 
     const subscriber = result.rows[0];
+
+    // Mark pending checkout as account_created
+    await query(
+      'UPDATE pending_checkouts SET account_created = true WHERE stripe_session_id = $1',
+      [session_id]
+    );
 
     // Generate token
     const token = generateToken({

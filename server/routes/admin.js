@@ -102,4 +102,21 @@ router.get('/stats', async (req, res) => {
   }
 });
 
+// GET /pending-checkouts - Paid but never created an account
+router.get('/pending-checkouts', async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT id, email, name, plan, amount_cents, completed_at, account_created, created_at
+       FROM pending_checkouts
+       WHERE account_created = false
+       ORDER BY completed_at DESC`
+    );
+
+    res.json({ pending_checkouts: result.rows });
+  } catch (error) {
+    console.error('Error fetching pending checkouts:', error);
+    res.status(500).json({ error: 'Failed to fetch pending checkouts' });
+  }
+});
+
 module.exports = router;

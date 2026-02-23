@@ -153,6 +153,24 @@ CREATE TABLE IF NOT EXISTS invite_codes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Pending checkouts (paid but never created an account)
+CREATE TABLE IF NOT EXISTS pending_checkouts (
+    id SERIAL PRIMARY KEY,
+    stripe_session_id VARCHAR(255) UNIQUE NOT NULL,
+    stripe_customer_id VARCHAR(255),
+    stripe_subscription_id VARCHAR(255),
+    email VARCHAR(255),
+    name VARCHAR(255),
+    plan VARCHAR(100),
+    amount_cents INTEGER,
+    completed_at TIMESTAMP,
+    account_created BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_pending_checkouts_email ON pending_checkouts(email);
+CREATE INDEX IF NOT EXISTS idx_pending_checkouts_account_created ON pending_checkouts(account_created);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_subscribers_email ON subscribers(email);
 CREATE INDEX IF NOT EXISTS idx_subscribers_stripe_customer_id ON subscribers(stripe_customer_id);
