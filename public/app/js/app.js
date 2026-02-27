@@ -45,7 +45,7 @@
       const res = await apiFetch('/auth/subscriber/me');
       if (!res || !res.ok) return false;
       const data = await res.json();
-      currentUser = data.user || data;
+      currentUser = data.subscriber || data.user || data;
       return true;
     } catch (e) {
       return false;
@@ -104,6 +104,7 @@
       }
 
       grid.innerHTML = items.map(function(item) {
+        var itemId = item.content_id || item.id;
         var imageStyle = '';
         var imageContent = '';
         if (item.featured_image_url || item.image_url || item.thumbnail_url) {
@@ -117,10 +118,10 @@
             'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
             'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)'
           ];
-          imageStyle = 'style="background:' + gradients[item.id % gradients.length] + '"';
+          imageStyle = 'style="background:' + gradients[itemId % gradients.length] + '"';
           imageContent = '<span style="font-size:2rem;opacity:0.8">&#9733;</span>';
         }
-        return '<div class="content-card" onclick="window.app.openPersonalize(' + item.id + ')" data-id="' + item.id + '">' +
+        return '<div class="content-card" onclick="window.app.openPersonalize(' + itemId + ')" data-id="' + itemId + '">' +
           '<div class="content-card-image" ' + imageStyle + '>' + imageContent +
           '<span class="content-card-badge">' + escapeHtml(item.content_type || item.type || 'post') + '</span></div>' +
           '<div class="content-card-body"><div class="content-card-title">' + escapeHtml(item.title) + '</div>' +
@@ -177,7 +178,7 @@
       var res = await apiFetch('/content/' + contentId);
       if (!res) return;
       currentContentItem = await res.json();
-      var item = currentContentItem.content || currentContentItem;
+      var item = currentContentItem.item || currentContentItem.content || currentContentItem;
 
       currentCaptions = {
         facebook: item.caption_facebook || item.caption || '',
@@ -241,12 +242,12 @@
     var btn = document.getElementById('personalizeBtn');
     btn.disabled = true;
     btn.textContent = 'Generating...';
-    var item = currentContentItem.content || currentContentItem;
+    var item = currentContentItem.item || currentContentItem.content || currentContentItem;
 
     try {
       var res = await apiFetch('/personalize/generate', {
         method: 'POST',
-        body: JSON.stringify({ content_id: item.id })
+        body: JSON.stringify({ content_id: item.content_id || item.id })
       });
       if (!res) return;
       var data = await res.json();
@@ -304,7 +305,7 @@
     var platform = document.getElementById('schedulePlatform').value;
     var datetime = document.getElementById('scheduleDateTime').value;
     var caption = document.getElementById('scheduleCaption').value;
-    var item = currentContentItem.content || currentContentItem;
+    var item = currentContentItem.item || currentContentItem.content || currentContentItem;
 
     if (!datetime) {
       showModalError('Please select a date and time.');
@@ -315,7 +316,7 @@
       var res = await apiFetch('/schedule', {
         method: 'POST',
         body: JSON.stringify({
-          content_id: item.id,
+          content_id: item.content_id || item.id,
           platform: platform,
           scheduled_time: new Date(datetime).toISOString(),
           caption: caption
@@ -336,13 +337,13 @@
     var btn = document.getElementById('rewriteBtn');
     btn.disabled = true;
     btn.textContent = 'Rewriting...';
-    var item = currentContentItem.content || currentContentItem;
+    var item = currentContentItem.item || currentContentItem.content || currentContentItem;
 
     try {
       var res = await apiFetch('/personalize/rewrite-caption', {
         method: 'POST',
         body: JSON.stringify({
-          content_id: item.id,
+          content_id: item.content_id || item.id,
           platform: currentPlatform,
           caption: currentCaptions[currentPlatform]
         })
@@ -416,7 +417,7 @@
             '<div class="asset-card-meta">' + dateStr + (item.download_count ? ' &middot; ' + item.download_count + ' downloads' : '') + '</div>' +
             '<div class="asset-card-actions">' +
               '<a href="' + escapeHtml(item.download_url || item.image_url || '#') + '" download class="btn btn-sm btn-primary">Download</a>' +
-              '<button class="btn btn-sm btn-danger" onclick="window.app.deleteAsset(' + item.id + ')">Delete</button>' +
+              '<button class="btn btn-sm btn-danger" onclick="window.app.deleteAsset(' + (item.asset_id || item.id) + ')">Delete</button>' +
             '</div>' +
           '</div></div>';
       }).join('');
@@ -481,7 +482,7 @@
           '</div>' +
           '<span class="status-badge ' + status + '">' + status + '</span>' +
           '<div class="schedule-actions">' +
-            '<button class="btn btn-sm btn-ghost" onclick="window.app.deleteScheduledPost(' + item.id + ')">Delete</button>' +
+            '<button class="btn btn-sm btn-ghost" onclick="window.app.deleteScheduledPost(' + (item.post_id || item.id) + ')">Delete</button>' +
           '</div></div>';
       }).join('') + '</div>';
     } catch (e) {
@@ -762,6 +763,22 @@
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(function() { contentPage = 1; loadContentLibrary(); }, 400);
     });
+
+    // Load categories from API
+    try {
+      var catRes = await apiFetch('/content/categories/list');
+      if (catRes && catRes.ok) {
+        var catData = await catRes.json();
+        var catSelect = document.getElementById('filterCategory');
+        var cats = catData.categories || [];
+        if (cats.length > 0) {
+          catSelect.innerHTML = '<option value="">All Categories</option>' +
+            cats.map(function(c) {
+              return '<option value="' + escapeAttr(c) + '">' + escapeHtml(c.replace(/_/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); })) + '</option>';
+            }).join('');
+        }
+      }
+    } catch (e) { /* keep static options as fallback */ }
 
     // Load default tab
     switchTab('library');
