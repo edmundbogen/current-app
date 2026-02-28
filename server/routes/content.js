@@ -3,6 +3,22 @@ const router = express.Router();
 const { query } = require('../config/database');
 const { authenticateAdmin, optionalSubscriberAuth } = require('../middleware/auth');
 const { body, param, validationResult } = require('express-validator');
+const multer = require('multer');
+const path = require('path');
+const { uploadFile, ensureBucket } = require('../utils/storage');
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+    if (allowed.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only JPG, PNG, and WebP images are allowed'), false);
+    }
+  }
+});
 
 // GET /categories/list - must be before /:slug to avoid conflict
 router.get('/categories/list', async (req, res) => {
@@ -115,6 +131,45 @@ router.get('/:identifier', optionalSubscriberAuth, async (req, res) => {
   } catch (error) {
     console.error('Error fetching content item:', error);
     res.status(500).json({ error: 'Failed to fetch content item' });
+  }
+});
+
+// POST /upload-image - Upload content featured image (admin only)
+router.post('/upload-image', authenticateAdmin, (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ error: 'File size must be under 10MB' });
+      }
+      return res.status(400).json({ error: err.message });
+    }
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    next();
+  });
+}, async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    await ensureBucket('content-images');
+
+    const ext = path.extname(req.file.originalname).toLowerCase() || '.jpg';
+    const filename = `content-${Date.now()}${ext}`;
+
+    const publicUrl = await uploadFile(
+      'content-images',
+      filename,
+      req.file.buffer,
+      req.file.mimetype
+    );
+
+    res.json({ url: publicUrl });
+  } catch (error) {
+    console.error('Error uploading content image:', error);
+    res.status(500).json({ error: 'Failed to upload image' });
   }
 });
 

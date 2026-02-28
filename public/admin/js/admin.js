@@ -248,6 +248,33 @@ function updateTwitterCount() {
   countEl.parentElement.className = val.length > 280 ? 'char-counter over' : 'char-counter';
 }
 
+async function handleImageUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const preview = document.getElementById('cf-image-preview');
+  preview.innerHTML = '<span style="color:var(--text-secondary)">Uploading...</span>';
+
+  try {
+    const res = await fetch('/api/content/upload-image', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: formData
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Upload failed');
+
+    document.getElementById('cf-image').value = data.url;
+    preview.innerHTML = '<img src="' + escapeHtml(data.url) + '" style="max-width:200px;max-height:120px;border-radius:6px">';
+    showToast('Image uploaded', 'success');
+  } catch (err) {
+    preview.innerHTML = '';
+    showToast('Image upload failed: ' + err.message, 'error');
+  }
+}
+
 async function handleContentSubmit(e) {
   e.preventDefault();
 

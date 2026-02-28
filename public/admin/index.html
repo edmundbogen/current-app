@@ -160,8 +160,15 @@
               </select>
             </div>
             <div class="form-group flex-1">
-              <label for="cf-image">Featured Image URL</label>
-              <input type="text" id="cf-image" placeholder="https://...">
+              <label for="cf-image">Featured Image</label>
+              <div style="display:flex;gap:8px;align-items:center">
+                <input type="text" id="cf-image" placeholder="https://..." style="flex:1">
+                <label class="btn btn-outline" style="cursor:pointer;white-space:nowrap;margin:0">
+                  Upload
+                  <input type="file" id="cf-image-upload" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
+                </label>
+              </div>
+              <div id="cf-image-preview" style="margin-top:8px"></div>
             </div>
           </div>
           <div class="form-row">
